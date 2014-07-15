@@ -22,7 +22,7 @@ private[phantom] object Lock
  * A field part of a user defined type.
  * @param owner The UDT column that owns the field.
  * @tparam T The Scala type corresponding the underlying Cassandra type of the UDT field.
-
+*/
 sealed abstract class AbstractField[@specialized(Int, Double, Float, Long, Boolean, Short) T](owner: UDT[_]) {
   lazy val name: String = getClass.getSimpleName.replaceAll("\\$+", "").replaceAll("(anonfun\\d+.+\\d+)|", "")
 
@@ -99,4 +99,3 @@ class BigIntField[T <: UDT[T]](column: T)  extends Field[T, BigInt](column)
 class BigDecimalField[T <: UDT[T]](column: T)  extends Field[T, BigDecimal](column)
 class UDTField[Owner <: UDT[Owner], T <: UDT[_]](column: Owner) extends Field[Owner, T](column)
 class UUIDField[Owner <: UDT[Owner]](column: Owner) extends Field[Owner, UUID](column)
- */
