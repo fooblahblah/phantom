@@ -15,10 +15,13 @@
  */
 package com.websudos.phantom
 
-import java.util.{ UUID, Date }
 import java.net.InetAddress
+import java.util.{Date, UUID}
+
 import scala.util.Try
+
 import org.joda.time.DateTime
+
 import com.datastax.driver.core.Row
 
 trait CassandraWrites[T] {

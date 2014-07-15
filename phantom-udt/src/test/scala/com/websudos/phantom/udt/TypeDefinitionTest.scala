@@ -18,8 +18,6 @@
 
 package com.websudos.phantom.udt
 
-import com.newzly.util.testing.cassandra.BaseTest
-
 class TypeDefinitionTest extends BaseTest {
   val keySpace = "udt_test"
 

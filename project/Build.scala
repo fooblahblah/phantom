@@ -134,7 +134,8 @@ object phantom extends Build {
     phantomScalatraTest,
     phantomSpark,
     phantomZookeeper,
-    phantomThrift
+    phantomThrift,
+    phantomUdt
   )
 
   lazy val phantomDsl = Project(
@@ -164,6 +165,20 @@ object phantom extends Build {
       "net.liftweb"                  %% "lift-json"                         % "2.6-M4"                  % "test, provided"
     )
   )
+
+  lazy val phantomUdt = Project(
+    id = "phantom-udt",
+    base = file("phantom-udt"),
+    settings = Defaults.coreDefaultSettings ++ sharedSettings
+  ).settings(
+    name := "phantom-udt",
+    scalacOptions ++= Seq(
+      "-language:experimental.macros"
+    )
+  ).dependsOn(
+    phantomDsl
+  )
+
 
   lazy val phantomSpark = Project(
     id = "phantom-spark",

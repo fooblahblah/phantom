@@ -1,12 +1,13 @@
 package com.websudos.phantom.udt
 
 import java.net.InetAddress
-import java.util.UUID
+import java.util.{ Date, UUID }
 
 import scala.collection.mutable.{ArrayBuffer => MutableArrayBuffer, SynchronizedBuffer => MutableSyncBuffer}
 import scala.reflect.runtime.universe.Symbol
 import scala.reflect.runtime.{currentMirror => cm, universe => ru}
 import scala.util.DynamicVariable
+import org.joda.time.DateTime
 
 import com.datastax.driver.core.{ Cluster, Row, UserType }
 import com.websudos.phantom.CassandraPrimitive
@@ -26,18 +27,17 @@ private[phantom] object Lock
 sealed abstract class AbstractField[@specialized(Int, Double, Float, Long, Boolean, Short) T](owner: UDT[_]) {
   lazy val name: String = getClass.getSimpleName.replaceAll("\\$+", "").replaceAll("(anonfun\\d+.+\\d+)|", "")
 
-
   protected[this] lazy val valueBox = new DynamicVariable[Option[T]](None)
-
-  protected[this] def typeDef()(implicit cluster: Cluster, keySpace: String): UserType = cluster.getMetadata.getKeyspace(keySpace).getUserType(name)
 
   def value: T = valueBox.value.getOrElse(null.asInstanceOf[T])
 
   def cassandraType: String
+
+  def getValue(row: Row): T
 }
 
 
-abstract class Field[Owner <: UDT[T], T : CassandraPrimitive](column: Owner) extends AbstractField[T](column) {
+abstract class Field[Owner <: UDT[_], T : CassandraPrimitive](column: Owner) extends AbstractField[T](column) {
   def apply(item: T): Owner = {
     valueBox.value_=(Some(item))
     column
@@ -47,11 +47,19 @@ abstract class Field[Owner <: UDT[T], T : CassandraPrimitive](column: Owner) ext
 }
 
 
-abstract class UDT[T <: UDT[T]] extends AbstractColumn[T] {
+abstract class UDT[T] extends AbstractColumn[T] {
 
   private[this] lazy val _fields: MutableArrayBuffer[AbstractField[_]] = new MutableArrayBuffer[AbstractField[_]] with MutableSyncBuffer[AbstractField[_]]
 
-  def apply(row: Row): T
+  val keySpace: String
+
+  val cluster: Cluster
+
+  lazy val typeDef: UserType = cluster.getMetadata.getKeyspace(keySpace).getUserType(name)
+
+  def apply(row: Row): T = {
+    _fields.map(_.getValue(row))
+  }
 
   private[this] lazy val _name: String = {
     getClass.getName.split("\\.").toList.last.replaceAll("[^$]*\\$\\$[^$]*\\$[^$]*\\$|\\$\\$[^\\$]*\\$", "").dropRight(1)
@@ -90,12 +98,44 @@ abstract class UDT[T <: UDT[T]] extends AbstractColumn[T] {
     queryInit + queryColumns + """");""""
   }
 }
-class StringField[T <: UDT[T]](column: T) extends Field[T, String](column) {}
-class InetField[T <: UDT[T]](column: T)  extends Field[T, InetAddress](column)
-class IntField[T <: UDT[T]](column: T)  extends Field[T, Int](column)
-class DoubleField[T <: UDT[T]](column: T)  extends Field[T, Double](column)
-class LongField[T <: UDT[T]](column: T)  extends Field[T, Long](column)
-class BigIntField[T <: UDT[T]](column: T)  extends Field[T, BigInt](column)
-class BigDecimalField[T <: UDT[T]](column: T)  extends Field[T, BigDecimal](column)
-class UDTField[Owner <: UDT[Owner], T <: UDT[_]](column: Owner) extends Field[Owner, T](column)
-class UUIDField[Owner <: UDT[Owner]](column: Owner) extends Field[Owner, UUID](column)
+
+class StringField[T <: UDT[_]](column: T) extends Field[T, String](column) {
+  def getValue(row: Row): String = row.getString(this.name)
+}
+
+class InetField[T <: UDT[_]](column: T)  extends Field[T, InetAddress](column) {
+  def getValue(row: Row): InetAddress = row.getInet(this.name)
+}
+
+class IntField[T <: UDT[_]](column: T)  extends Field[T, Int](column) {
+  def getValue(row: Row): Int = row.getInt(this.name)
+}
+
+class DoubleField[T <: UDT[_]](column: T)  extends Field[T, Double](column) {
+  def getValue(row: Row): Double = row.getDouble(this.name)
+}
+
+class LongField[T <: UDT[_]](column: T)  extends Field[T, Long](column) {
+  def getValue(row: Row): Long = row.getLong(this.name)
+}
+
+class BigIntField[T <: UDT[_]](column: T)  extends Field[T, BigInt](column) {
+  def getValue(row: Row): BigInt = row.getVarint(this.name)
+}
+
+class BigDecimalField[T <: UDT[_]](column: T)  extends Field[T, BigDecimal](column) {
+  def getValue(row: Row): BigDecimal = row.getDecimal(this.name)
+}
+
+class DateField[T <: UDT[_]](column: T) extends Field[T, Date](column) {
+  def getValue(row: Row): Date = row.getDate(this.name)
+}
+
+class DateTimeField[T <: UDT[_]](column: T) extends Field[T, DateTime](column) {
+  def getValue(row: Row): DateTime = new DateTime(row.getDate(this.name))
+}
+
+//class UDTField[Owner <: UDT[Owner], T <: UDT[_]](column: Owner) extends Field[Owner, T](column)
+class UUIDField[Owner <: UDT[_]](column: Owner) extends Field[Owner, UUID](column) {
+  def getValue(row: Row): UUID = row.getUUID(this.name)
+}
