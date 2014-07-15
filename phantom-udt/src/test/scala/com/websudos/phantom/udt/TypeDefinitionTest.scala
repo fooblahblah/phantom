@@ -18,17 +18,52 @@
 
 package com.websudos.phantom.udt
 
+import java.util.UUID
+
+import com.datastax.driver.core.Row
+import com.newzly.util.testing.cassandra.{BaseTestHelper, BaseTest}
+
+import com.twitter.conversions.time._
+import com.twitter.util.Await
+
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.keys.PartitionKey
+
 class TypeDefinitionTest extends BaseTest {
   val keySpace = "udt_test"
 
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    Await.ready(TestTable.create.execute(), 2.seconds)
+  }
 
 }
 
 
-class Address extends UDT[Address] {
+case class TestRecord(id: UUID, str: String, address: Address)
 
-  object id extends UUIDField(this)
-  object name extends StringField(this)
+class TestTable extends CassandraTable[TestTable, TestRecord] {
+  object id extends UUIDColumn(this) with PartitionKey[UUID]
+  object str extends StringColumn(this)
+  object address extends UDT[TestTable, TestRecord, Address](this) {
+    val cluster = BaseTestHelper.cluster
 
-  object postcode extends StringField(this)
+    val keySpace = "udt_test"
+  }
+
+  def fromRow(r: Row): TestRecord = TestRecord(id(r), str(r), address(r))
+}
+
+object TestTable extends TestTable
+
+class Address extends UDT[TestTable, TestRecord, Address](TestTable) {
+
+  object id extends UUIDField[TestTable, TestRecord, Address](this)
+  object street extends StringField[TestTable, TestRecord, Address](this)
+
+  object postcode extends StringField[TestTable, TestRecord, Address](this)
+
+  val keySpace = "udt_test"
+
+  val cluster = BaseTestHelper.cluster
 }
