@@ -16,12 +16,14 @@
 package com.websudos.phantom.dsl.batch
 
 import scala.concurrent.blocking
+
 import org.joda.time.DateTime
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
-import com.websudos.phantom.Implicits._
-import com.websudos.phantom.tables.{ JodaRow, PrimitivesJoda, Recipe, Recipes }
+
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.tables.{JodaRow, PrimitivesJoda}
 import com.websudos.phantom.testing.BaseTest
 
 

@@ -20,6 +20,8 @@ package com.websudos.phantom.zookeeper
 
 import org.scalatest.{Matchers, FlatSpec, ParallelTestExecution}
 
+object TestTable extends DefaultZookeeperConnector
+
 class ZookeeperConnectorTest extends FlatSpec with Matchers with  ParallelTestExecution {
 
   it should "correctly use the default localhost:2181 connector address if no environment variable has been set" in {
