@@ -37,6 +37,12 @@ class TypeDefinitionTest extends BaseTest {
     Await.ready(TestTable.create.execute(), 2.seconds)
   }
 
+  it should "correctly serialise a UDT definition into a schema" in {
+    val address = new Address
+
+    address.schema() shouldEqual "fsa"
+  }
+
 }
 
 

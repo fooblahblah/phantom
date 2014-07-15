@@ -133,9 +133,10 @@ object phantom extends Build {
     phantomExample,
     phantomScalatraTest,
     phantomSpark,
-    phantomZookeeper,
+    phantomTesting,
     phantomThrift,
-    phantomUdt
+    phantomUdt,
+    phantomZookeeper
   )
 
   lazy val phantomDsl = Project(
@@ -230,6 +231,32 @@ object phantom extends Build {
     )
   ).dependsOn(
     phantomDsl
+  )
+
+  lazy val phantomTesting = Project(
+    id = "phantom-testing",
+    base = file("phantom-testing"),
+    settings = Defaults.coreDefaultSettings ++ sharedSettings
+  ).settings(
+    name := "phantom-testing",
+    libraryDependencies ++= Seq(
+      "com.twitter"                      %% "util-core"                % finagleVersion,
+      "org.scalatest"                    %% "scalatest"                % scalatestVersion,
+      "org.scalacheck"                   %% "scalacheck"               % "1.11.3"              % "test",
+      "org.fluttercode.datafactory"      %  "datafactory"              % "0.8",
+      "com.twitter"                      %% "finagle-serversets"       % finagleVersion,
+      "com.twitter"                      %% "finagle-zookeeper"        % finagleVersion,
+      "org.cassandraunit"                %  "cassandra-unit"           % "2.0.2.1"  excludeAll (
+        ExclusionRule("org.slf4j", "slf4j-log4j12"),
+        ExclusionRule("org.slf4j", "slf4j-jdk14"),
+        ExclusionRule("com.google.guava", "guava")
+        ),
+      "com.google.guava"                 %  "guava"                    % "0.17",
+      "org.scalatest"                    %% "scalatest"                % scalatestVersion       % "test"
+    )
+  ).dependsOn(
+    phantomDsl,
+    phantomZookeeper
   )
 
   lazy val phantomExample = Project(
