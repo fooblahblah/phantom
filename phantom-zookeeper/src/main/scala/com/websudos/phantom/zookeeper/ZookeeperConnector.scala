@@ -28,14 +28,8 @@ import com.datastax.driver.core.{Cluster, Session}
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.util.{Await, Try}
-import com.websudos.phantom.CassandraTable
-
-
-
 
 trait ZookeeperConnector {
-
-  self: CassandraTable[_, _] =>
 
   protected[zookeeper] val envString = "TEST_ZOOKEEPER_CONNECTOR"
 
@@ -58,8 +52,6 @@ trait ZookeeperConnector {
 }
 
 trait DefaultZookeeperConnector extends ZookeeperConnector {
-
-  self : CassandraTable[_, _] =>
 
   def zkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
     val inetPair: String = System.getProperty(envString)

@@ -162,9 +162,10 @@ object phantom extends Build {
       "com.datastax.cassandra"       %  "cassandra-driver-core"             % datastaxDriverVersion,
       "org.scalacheck"               %% "scalacheck"                        % "1.11.4"                  % "test, provided",
       "com.newzly"                   %% "util-testing"                      % newzlyUtilVersion         % "provided",
-      "com.newzly"                   %% "util-testing-cassandra"            % newzlyUtilVersion         % "provided" exclude("org.slf4j", "slf4j-jdk14"),
       "net.liftweb"                  %% "lift-json"                         % "2.6-M4"                  % "test, provided"
     )
+  ).dependsOn(
+    phantomTesting
   )
 
   lazy val phantomUdt = Project(
@@ -180,7 +181,8 @@ object phantom extends Build {
       "-language:experimental.macros"
     )
   ).dependsOn(
-    phantomDsl
+    phantomDsl,
+    phantomTesting
   )
 
 
@@ -195,7 +197,8 @@ object phantom extends Build {
       "com.datastax.spark"           %% "spark-cassandra-connector"         % "1.0.0-beta1"
     )
   ).dependsOn(
-    phantomDsl
+    phantomDsl,
+    phantomTesting
   )
 
   lazy val phantomThrift = Project(
@@ -212,11 +215,11 @@ object phantom extends Build {
       "com.twitter"                  %% "scrooge-core"                      % scroogeVersion,
       "com.twitter"                  %% "scrooge-runtime"                   % scroogeVersion,
       "com.twitter"                  %% "scrooge-serializer"                % scroogeVersion,
-      "com.newzly"                   %% "util-testing"                      % newzlyUtilVersion         % "test, provided",
-      "com.newzly"                   %% "util-testing-cassandra"            % newzlyUtilVersion         % "provided" exclude("org.slf4j", "slf4j-jdk14")
+      "com.newzly"                   %% "util-testing"                      % newzlyUtilVersion         % "test, provided"
     )
   ).dependsOn(
-    phantomDsl
+    phantomDsl,
+    phantomTesting
   )
 
   lazy val phantomZookeeper = Project(
@@ -226,11 +229,10 @@ object phantom extends Build {
   ).settings(
     name := "phantom-zookeeper",
     libraryDependencies ++= Seq(
-      "com.newzly"                   %% "util-testing-cassandra"            % newzlyUtilVersion         % "provided" exclude("org.slf4j", "slf4j-jdk14"),
+      "com.datastax.cassandra"       %  "cassandra-driver-core"             % datastaxDriverVersion,
+      "com.twitter"                  %% "finagle-serversets"                % finagleVersion,
       "com.twitter"                  %% "finagle-zookeeper"                 % finagleVersion
     )
-  ).dependsOn(
-    phantomDsl
   )
 
   lazy val phantomTesting = Project(
@@ -248,14 +250,12 @@ object phantom extends Build {
       "com.twitter"                      %% "finagle-zookeeper"        % finagleVersion,
       "org.cassandraunit"                %  "cassandra-unit"           % "2.0.2.1"  excludeAll (
         ExclusionRule("org.slf4j", "slf4j-log4j12"),
-        ExclusionRule("org.slf4j", "slf4j-jdk14"),
-        ExclusionRule("com.google.guava", "guava")
-        ),
+        ExclusionRule("org.slf4j", "slf4j-jdk14")
+      ),
       "com.google.guava"                 %  "guava"                    % "0.17",
       "org.scalatest"                    %% "scalatest"                % scalatestVersion       % "test"
     )
   ).dependsOn(
-    phantomDsl,
     phantomZookeeper
   )
 
@@ -295,11 +295,12 @@ object phantom extends Build {
       "net.databinder.dispatch"   %% "dispatch-json4s-jackson"          % "0.11.0"               % "test",
       "org.eclipse.jetty"         % "jetty-webapp"                      % "8.1.8.v20121106",
       "org.eclipse.jetty.orbit"   % "javax.servlet"                     % "3.0.0.v201112011016"  % "provided;test" artifacts Artifact("javax.servlet", "jar", "jar"),
-      "com.newzly"                %% "util-testing"                     % newzlyUtilVersion      % "provided",
-      "com.newzly"                %% "util-testing-cassandra"           % newzlyUtilVersion      % "test, provided" exclude("org.slf4j", "slf4j-jdk14")
+      "com.newzly"                %% "util-testing"                     % newzlyUtilVersion      % "provided"
     )
   ).dependsOn(
     phantomDsl,
-    phantomThrift
+    phantomThrift,
+    phantomZookeeper,
+    phantomTesting
   )
 }

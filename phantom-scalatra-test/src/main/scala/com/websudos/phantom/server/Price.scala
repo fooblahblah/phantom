@@ -8,6 +8,8 @@ import com.websudos.phantom.Implicits._
 import com.websudos.phantom.helper.{ModelSampler, TestSampler}
 import org.joda.time.{DateTime, LocalDate}
 
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+
 
 sealed trait Price {
   def instrumentId: String
@@ -66,7 +68,7 @@ sealed class OptionPrices extends CassandraTable[OptionPrices, OptionPrice] {
     OptionPrice(instrumentId(r), new LocalDate(tradeDate(r)), exchangeCode(r), t(r), strikePrice(r), value(r))
 }
 
-object EquityPrices extends EquityPrices with TestSampler[EquityPrices, EquityPrice] with ModelSampler[EquityPrice] {
+object EquityPrices extends EquityPrices with TestSampler[EquityPrices, EquityPrice] with ModelSampler[EquityPrice] with DefaultZookeeperConnector {
   override val tableName: String = "EquityPrices"
 
   override def sample: EquityPrice = EquityPrice(
@@ -87,7 +89,7 @@ object EquityPrices extends EquityPrices with TestSampler[EquityPrices, EquityPr
 
 }
 
-object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPrice] with ModelSampler[OptionPrice] {
+object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPrice] with ModelSampler[OptionPrice] with DefaultZookeeperConnector {
   override val tableName: String = "OptionPrices"
 
   override def sample: OptionPrice = OptionPrice(

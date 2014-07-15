@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 
 
 
-class PricesAccess extends ScalatraServlet with JacksonJsonSupport with ScalateSupport with CassandraCluster {
+class PricesAccess extends ScalatraServlet with JacksonJsonSupport with ScalateSupport {
 
   private[this] val dateFormat = DateTimeFormat.forPattern("YYYYMMdd")
 
