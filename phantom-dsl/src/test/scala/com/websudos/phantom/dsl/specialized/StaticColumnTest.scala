@@ -8,7 +8,7 @@ import com.datastax.driver.core.utils.UUIDs
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.StaticTableTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class StaticColumnTest extends BaseTest {
   val keySpace = "static_columns_test"

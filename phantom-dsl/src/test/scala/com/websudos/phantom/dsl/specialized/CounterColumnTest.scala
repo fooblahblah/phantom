@@ -21,7 +21,7 @@ import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.{ CounterRecord, CounterTableTest }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class CounterColumnTest extends BaseTest {
   val keySpace = "counter_column_test"

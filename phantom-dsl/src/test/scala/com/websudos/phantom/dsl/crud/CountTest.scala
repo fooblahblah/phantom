@@ -22,7 +22,7 @@ import com.websudos.phantom.Implicits._
 import com.websudos.phantom.batch.BatchStatement
 import com.websudos.phantom.tables.{ PrimitivesJoda, JodaRow }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class CountTest extends BaseTest {
   val keySpace: String = "counttests"

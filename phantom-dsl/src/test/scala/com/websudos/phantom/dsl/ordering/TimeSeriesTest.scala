@@ -19,7 +19,7 @@ import com.websudos.phantom.Implicits._
 import com.websudos.phantom.iteratee.Iteratee
 import com.websudos.phantom.tables.{TimeSeriesRecord, TimeSeriesTable}
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.PatienceConfiguration
 import scala.collection.JavaConverters._

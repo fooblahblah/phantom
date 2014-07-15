@@ -23,7 +23,7 @@ import org.scalatest.time.SpanSugar._
 
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.{ JodaRow, PrimitivesJoda }
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class UnloggedBatchTest extends BaseTest {

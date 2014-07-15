@@ -33,7 +33,7 @@ import com.datastax.driver.core.{ Cluster, Session }
 
 import com.twitter.conversions.time._
 import com.twitter.util.{ Await, Try }
-import com.websudos.phantom.zookeeper.ZookeeperInstance
+import com.websudos.phantom.zookeeper.{DefaultZookeeperConnector, ZookeeperInstance}
 
 object BaseTestHelper {
 
@@ -99,8 +99,8 @@ trait CassandraTest {
   }
 }
 
-trait BaseTest extends FlatSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest
+trait BaseTest extends FlatSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest with DefaultZookeeperConnector
 
-trait FeatureBaseTest extends FeatureSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest
+trait FeatureBaseTest extends FeatureSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest with DefaultZookeeperConnector
 
 

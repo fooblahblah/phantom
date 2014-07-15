@@ -19,7 +19,7 @@ import scala.concurrent.Future
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.tables.{ Primitive, Primitives }
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class IterateeTakeTest extends BaseTest {

@@ -31,7 +31,7 @@ import com.websudos.phantom.tables.{
   TestTable
 }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class InsertTest extends BaseTest {
   val keySpace: String = "InsertTestKeySpace"

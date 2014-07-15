@@ -23,7 +23,7 @@ import com.websudos.phantom.tables.ThriftColumnTable
 import com.websudos.phantom.thrift.ThriftTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class ThriftListOperations extends BaseTest {
   val keySpace = "thriftlistoperations"

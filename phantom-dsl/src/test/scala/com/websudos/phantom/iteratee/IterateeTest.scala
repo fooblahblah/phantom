@@ -21,7 +21,7 @@ import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.{ Primitives, Primitive, PrimitivesJoda, JodaRow }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class IterateeTest extends BaseTest {
   val keySpace: String = "IterateeTestSpace"

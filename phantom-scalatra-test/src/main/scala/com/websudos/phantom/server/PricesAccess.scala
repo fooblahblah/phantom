@@ -10,10 +10,10 @@ import org.scalatra.scalate.ScalateSupport
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 
-
-class PricesAccess extends ScalatraServlet with JacksonJsonSupport with ScalateSupport {
+class PricesAccess extends ScalatraServlet with JacksonJsonSupport with ScalateSupport with DefaultZookeeperConnector {
 
   private[this] val dateFormat = DateTimeFormat.forPattern("YYYYMMdd")
 

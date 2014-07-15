@@ -215,6 +215,7 @@ object phantom extends Build {
       "com.twitter"                  %% "scrooge-core"                      % scroogeVersion,
       "com.twitter"                  %% "scrooge-runtime"                   % scroogeVersion,
       "com.twitter"                  %% "scrooge-serializer"                % scroogeVersion,
+      "org.scalatest"                %% "scalatest"                         % scalatestVersion          % "test, provided",
       "com.newzly"                   %% "util-testing"                      % newzlyUtilVersion         % "test, provided"
     )
   ).dependsOn(
@@ -229,6 +230,7 @@ object phantom extends Build {
   ).settings(
     name := "phantom-zookeeper",
     libraryDependencies ++= Seq(
+      "org.scalatest"                %% "scalatest"                         % scalatestVersion,
       "com.datastax.cassandra"       %  "cassandra-driver-core"             % datastaxDriverVersion,
       "com.twitter"                  %% "finagle-serversets"                % finagleVersion,
       "com.twitter"                  %% "finagle-zookeeper"                 % finagleVersion
@@ -252,8 +254,7 @@ object phantom extends Build {
         ExclusionRule("org.slf4j", "slf4j-log4j12"),
         ExclusionRule("org.slf4j", "slf4j-jdk14")
       ),
-      "com.google.guava"                 %  "guava"                    % "0.17",
-      "org.scalatest"                    %% "scalatest"                % scalatestVersion       % "test"
+      "com.google.guava"                 %  "guava"                    % "0.17"
     )
   ).dependsOn(
     phantomZookeeper

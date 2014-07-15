@@ -26,7 +26,7 @@ import com.websudos.phantom.tables.{
   TestTable
 }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 
 class UpdateTest extends BaseTest with Matchers with Assertions with AsyncAssertions {

@@ -21,7 +21,7 @@ import com.datastax.driver.core.exceptions.InvalidQueryException
 import com.websudos.phantom.tables.{ SecondaryIndexRecord, SecondaryIndexTable }
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
-import com.newzly.util.testing.cassandra.BaseTest
+import com.websudos.phantom.testing.BaseTest
 
 class SecondaryIndexTest extends BaseTest {
   val keySpace = "secondary_index_test"
