@@ -50,7 +50,7 @@ private[testing] object ZookeperManager {
    * @return A boolean saying if Cassandra is started.
    */
   def isCassandraStarted: Boolean = {
-    Try { new ServerSocket(9142) }.toOption.isEmpty || Try { new ServerSocket(9042) }.toOption.isEmpty
+    Try { new ServerSocket(9142) }.toOption.isEmpty
   }
 }
 

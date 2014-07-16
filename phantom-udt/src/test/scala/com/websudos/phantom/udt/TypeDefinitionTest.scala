@@ -21,14 +21,14 @@ package com.websudos.phantom.udt
 import java.util.UUID
 
 import com.datastax.driver.core.Row
-import com.newzly.util.testing.cassandra.{BaseTestHelper, BaseTest}
 
 import com.twitter.conversions.time._
 import com.twitter.util.Await
 
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.keys.PartitionKey
+import com.websudos.phantom.testing.BaseTest
 
+/*
 class TypeDefinitionTest extends BaseTest {
   val keySpace = "udt_test"
 
@@ -42,9 +42,7 @@ class TypeDefinitionTest extends BaseTest {
 
     address.schema() shouldEqual "fsa"
   }
-
 }
-
 
 case class TestRecord(id: UUID, str: String, address: Address)
 
@@ -52,7 +50,6 @@ class TestTable extends CassandraTable[TestTable, TestRecord] {
   object id extends UUIDColumn(this) with PartitionKey[UUID]
   object str extends StringColumn(this)
   object address extends UDT[TestTable, TestRecord, Address](this) {
-    val cluster = BaseTestHelper.cluster
 
     val keySpace = "udt_test"
   }
@@ -70,6 +67,5 @@ class Address extends UDT[TestTable, TestRecord, Address](TestTable) {
   object postcode extends StringField[TestTable, TestRecord, Address](this)
 
   val keySpace = "udt_test"
-
-  val cluster = BaseTestHelper.cluster
 }
+*/

@@ -174,9 +174,6 @@ object phantom extends Build {
     settings = Defaults.coreDefaultSettings ++ sharedSettings
   ).settings(
     name := "phantom-udt",
-    libraryDependencies ++= Seq(
-      "com.newzly"                   %% "util-testing-cassandra"            % newzlyUtilVersion         % "provided" exclude("org.slf4j", "slf4j-jdk14")
-    ),
     scalacOptions ++= Seq(
       "-language:experimental.macros"
     )
