@@ -19,6 +19,7 @@
 package com.websudos.phantom.zookeeper
 
 import java.net.InetSocketAddress
+import java.util.concurrent.atomic.AtomicBoolean
 
 import org.apache.zookeeper.server.persistence.FileTxnSnapLog
 import org.apache.zookeeper.server.{NIOServerCnxn, ZKDatabase, ZooKeeperServer}
@@ -33,6 +34,8 @@ import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
 import com.twitter.util.{Await, RandomSocket}
 
 class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSocket.nextAddress()) {
+
+  private[this] val status = new AtomicBoolean(false)
 
   val zookeeperAddress = address
   val zookeeperConnectString  = zookeeperAddress.getHostName + ":" + zookeeperAddress.getPort
@@ -58,27 +61,31 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
   lazy val richClient = ZooKeeper.newRichClient(zookeeperConnectString)
 
   def start() {
-    connectionFactory.startup(zookeeperServer)
+    if (status.compareAndSet(false, true)) {
+      connectionFactory.startup(zookeeperServer)
 
-    zookeeperClient = new ZooKeeperClient(
-      Amount.of(10, Time.MILLISECONDS),
-      zookeeperAddress)
+      zookeeperClient = new ZooKeeperClient(
+        Amount.of(10, Time.MILLISECONDS),
+        zookeeperAddress)
 
-    val serverSet = new ServerSetImpl(zookeeperClient, "/cassandra")
-    val cluster = new ZookeeperServerSetCluster(serverSet)
+      val serverSet = new ServerSetImpl(zookeeperClient, "/cassandra")
+      val cluster = new ZookeeperServerSetCluster(serverSet)
 
-    cluster.join(zookeeperAddress)
+      cluster.join(zookeeperAddress)
 
-    Await.ready(richClient.connect(2.seconds), 2.seconds)
-    Await.ready(richClient.setData("/cassandra", "localhost:9142".getBytes, -1), 3.seconds)
+      Await.ready(richClient.connect(2.seconds), 2.seconds)
+      Await.ready(richClient.setData("/cassandra", "localhost:9142".getBytes, -1), 3.seconds)
 
-    // Disable noise from zookeeper logger
-    java.util.logging.LogManager.getLogManager.reset()
+      // Disable noise from zookeeper logger
+      java.util.logging.LogManager.getLogManager.reset()
+    }
   }
 
   def stop() {
-    connectionFactory.shutdown()
-    zookeeperClient.close()
-    Await.ready(richClient.close(), 2.seconds)
+    if (status.compareAndSet(true, false)) {
+      connectionFactory.shutdown()
+      zookeeperClient.close()
+      Await.ready(richClient.close(), 2.seconds)
+    }
   }
 }

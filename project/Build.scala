@@ -233,7 +233,8 @@ object phantom extends Build {
       "org.scalatest"                %% "scalatest"                         % scalatestVersion,
       "com.datastax.cassandra"       %  "cassandra-driver-core"             % datastaxDriverVersion,
       "com.twitter"                  %% "finagle-serversets"                % finagleVersion,
-      "com.twitter"                  %% "finagle-zookeeper"                 % finagleVersion
+      "com.twitter"                  %% "finagle-zookeeper"                 % finagleVersion,
+      "com.newzly"                   %% "util-testing"                      % newzlyUtilVersion      % "test, provided"
     )
   )
 

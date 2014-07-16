@@ -18,11 +18,13 @@
 
 package com.websudos.phantom.zookeeper
 
-import org.scalatest.{Matchers, FlatSpec, ParallelTestExecution}
+import org.scalatest._
+import com.newzly.util.testing.AsyncAssertionsHelper._
 
 object TestTable extends DefaultZookeeperConnector
 
-class ZookeeperConnectorTest extends FlatSpec with Matchers with  ParallelTestExecution {
+class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterAll {
+  val instance = new ZookeeperInstance()
 
   it should "correctly use the default localhost:2181 connector address if no environment variable has been set" in {
     System.setProperty(TestTable.envString, "")
@@ -42,11 +44,22 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with  ParallelTestEx
   }
 
   it should "return the default if the environment property is in invalid format" in {
+
     System.setProperty(TestTable.envString, "localhost:invalidint")
 
     TestTable.zkAddress.getHostName shouldEqual "localhost"
 
     TestTable.zkAddress.getPort shouldEqual 2181
+  }
+
+  it should "correctly retrieve the Cassandra series of ports from the Zookeeper cluster" in {
+    instance.start()
+    instance.richClient.getData(TestTable.zkPath, watch = false) successful {
+      res => {
+        info("Ports correctly retrieved from Cassandra.")
+        new String(res.data) shouldEqual "localhost:9142"
+      }
+    }
   }
 
 }

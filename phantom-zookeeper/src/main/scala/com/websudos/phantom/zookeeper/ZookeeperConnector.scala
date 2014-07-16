@@ -24,7 +24,7 @@ import java.net.InetSocketAddress
 import scala.collection.JavaConverters._
 import scala.concurrent.blocking
 
-import com.datastax.driver.core.{Cluster, Session}
+import com.datastax.driver.core.{ Cluster, Session }
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.util.{Await, Try}
@@ -70,7 +70,7 @@ trait DefaultZookeeperConnector extends ZookeeperConnector {
     defaultAddress
   }
 
-  lazy val hostnamePortPairs: Seq[InetSocketAddress] = Try {
+  def hostnamePortPairs: Seq[InetSocketAddress] = Try {
     val res = new String(Await.result(client.getData(zkPath, watch = false), 3.seconds).data)
 
     res.split("\\s*,\\s*").map(_.split(":")).map {
