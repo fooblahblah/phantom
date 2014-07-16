@@ -39,6 +39,8 @@ trait ZookeeperConnector {
 
   def zkAddress: InetSocketAddress
 
+  val keySpace: String
+
   val cluster: Cluster
 
   def connectorString = s"${zkAddress.getHostName}:${zkAddress.getPort}"
@@ -46,7 +48,7 @@ trait ZookeeperConnector {
   lazy val client = ZooKeeper.newRichClient(connectorString)
 
   implicit lazy val session: Session = blocking {
-    cluster.connect()
+    cluster.connect(keySpace)
   }
 
 }
