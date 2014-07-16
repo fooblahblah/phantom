@@ -28,8 +28,9 @@ import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
 
 import com.datastax.driver.core.Session
-import com.twitter.util.NonFatal
+import com.twitter.util.{Try, NonFatal}
 import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance, ZookeeperManager => Manager }
+import java.net.ServerSocket
 
 
 private[testing] object ZookeperManager {
@@ -41,6 +42,15 @@ private[testing] object ZookeperManager {
     if (isStarted.compareAndSet(false, true)) {
       zkInstance.start()
     }
+  }
+
+  /**
+   * This does a dummy check to see if Cassandra is started.
+   * It checks for default ports for embedded Cassandra and local Cassandra.
+   * @return A boolean saying if Cassandra is started.
+   */
+  def isCassandraStarted: Boolean = {
+    Try { new ServerSocket(9142) }.toOption.isEmpty || Try { new ServerSocket(9042) }.toOption.isEmpty
   }
 }
 
@@ -63,12 +73,14 @@ trait CassandraTest extends DefaultZookeeperConnector with ScalaFutures with Mat
   }
 
   override def beforeAll() {
-    try {
-      EmbeddedCassandraServerHelper.mkdirs()
-    } catch {
-      case NonFatal(e) => Manager.logger.error(e.getMessage)
+    if (!ZookeperManager.isCassandraStarted) {
+      try {
+        EmbeddedCassandraServerHelper.mkdirs()
+      } catch {
+        case NonFatal(e) => Manager.logger.error(e.getMessage)
+      }
+      EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     }
-    EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     createKeySpace(keySpace)
   }
 }
