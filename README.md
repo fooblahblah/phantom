@@ -214,7 +214,9 @@ libraryDependencies ++= Seq(
   "com.websudos"  %% "phantom-example"               % phantomVersion,
   "com.websudos"  %% "phantom-spark"                 % phantomVersion,
   "com.websudos"  %% "phantom-thrift"                % phantomVersion,
-  "com.websudos"  %% "phantom-test"                  % phantomVersion
+  "com.websudos"  %% "phantom-test"                  % phantomVersion,
+  "com.websudos"  %% "phantom-testing"               % phantomVersion,
+  "com.websudos"  %% "phantom-udt"                   % phantomVersion,
   "com.websudos"  %% "phantom-zookeeper"             % phantomVersion
 )
 ```

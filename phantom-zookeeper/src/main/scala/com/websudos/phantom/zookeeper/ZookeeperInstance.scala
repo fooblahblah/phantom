@@ -31,11 +31,14 @@ import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
 import com.twitter.util.{Await, RandomSocket}
 
-
 class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSocket.nextAddress()) {
 
   val zookeeperAddress = address
   val zookeeperConnectString  = zookeeperAddress.getHostName + ":" + zookeeperAddress.getPort
+
+  protected[this] val envString = "TEST_ZOOKEEPER_CONNECTOR"
+
+  System.setProperty(envString, zookeeperConnectString)
 
   lazy val connectionFactory: NIOServerCnxn.Factory = new NIOServerCnxn.Factory(zookeeperAddress)
   lazy val txn = new FileTxnSnapLog(createTempDir(), createTempDir())

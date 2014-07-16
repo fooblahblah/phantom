@@ -18,62 +18,36 @@
 
 package com.websudos.phantom.testing
 
-import java.net.InetSocketAddress
 import java.util.concurrent.atomic.AtomicBoolean
 
-import scala.collection.JavaConverters._
-import scala.concurrent.{ blocking, ExecutionContext }
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, blocking}
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper
-import org.scalatest.{ Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers }
-import org.scalatest.concurrent.{ AsyncAssertions, ScalaFutures }
+import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
+import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
 
-import com.datastax.driver.core.{ Cluster, Session }
+import com.datastax.driver.core.Session
+import com.twitter.util.Try
+import com.websudos.phantom.zookeeper.{ZookeeperInstance, DefaultZookeeperConnector}
 
-import com.twitter.conversions.time._
-import com.twitter.util.{ Await, Try }
-import com.websudos.phantom.zookeeper.{DefaultZookeeperConnector, ZookeeperInstance}
 
-object BaseTestHelper {
+private[testing] object ZookeperManager {
+  lazy val zkInstance = new ZookeeperInstance()
 
-  val zkInstance = new ZookeeperInstance()
+  private[this] val isStarted = new AtomicBoolean(false)
 
-  zkInstance.start()
-  val embeddedMode = new AtomicBoolean(false)
-
-  private[this] def getPort: Int = {
-    if (System.getenv().containsKey("TRAVIS_JOB_ID")) {
-      Console.println("Using Cassandra as a Travis Service with port 9042")
-      9142
-    } else {
-      Console.println("Using Embedded Cassandra with port 9142")
-      embeddedMode.compareAndSet(false, true)
-      9142
+  def start(): Unit = {
+    if (isStarted.compareAndSet(false, true)) {
+      zkInstance.start()
     }
-  }
-
-  val ports = Try {
-    val defaults = new String(Await.result(zkInstance.richClient.getData("/cassandra", watch = false), 3.seconds).data)
-    val seq = defaults.split("\\s*,\\s*").map(_.split(":")) map {
-      case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
-    }
-    seq.toSeq
-  } getOrElse Seq.empty[InetSocketAddress]
-
-  val cluster = Cluster.builder()
-    .addContactPointsWithPorts(ports.asJava)
-    .withoutJMXReporting()
-    .withoutMetrics()
-    .build()
-
-  lazy val session = blocking {
-    cluster.connect()
   }
 }
 
 trait CassandraTest {
   self: BeforeAndAfterAll =>
+
+  ZookeperManager.start()
 
   val keySpace: String
 
@@ -89,12 +63,10 @@ trait CassandraTest {
   }
 
   override def beforeAll() {
-    if (BaseTestHelper.embeddedMode.get()) {
-      Try {
-        EmbeddedCassandraServerHelper.mkdirs()
-      }
-      EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
+    Try {
+      EmbeddedCassandraServerHelper.mkdirs()
     }
+    EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     createKeySpace(keySpace)
   }
 }
