@@ -42,8 +42,6 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
 
   protected[this] val envString = "TEST_ZOOKEEPER_CONNECTOR"
 
-  System.setProperty(envString, zookeeperConnectString)
-
   lazy val connectionFactory: NIOServerCnxn.Factory = new NIOServerCnxn.Factory(zookeeperAddress)
   lazy val txn = new FileTxnSnapLog(createTempDir(), createTempDir())
   lazy val zkdb = new ZKDatabase(txn)
@@ -60,8 +58,13 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
 
   lazy val richClient = ZooKeeper.newRichClient(zookeeperConnectString)
 
+  def resetEnvironment(): Unit = {
+    System.setProperty(envString, zookeeperConnectString)
+  }
+
   def start() {
     if (status.compareAndSet(false, true)) {
+      resetEnvironment()
       connectionFactory.startup(zookeeperServer)
 
       zookeeperClient = new ZooKeeperClient(

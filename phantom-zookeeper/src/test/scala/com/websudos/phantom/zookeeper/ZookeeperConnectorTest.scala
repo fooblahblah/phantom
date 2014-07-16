@@ -18,8 +18,12 @@
 
 package com.websudos.phantom.zookeeper
 
-import org.scalatest._
+import java.net.InetSocketAddress
+import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
+
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.twitter.conversions.time._
+import com.twitter.util.Await
 
 object TestTable extends DefaultZookeeperConnector
 
@@ -54,10 +58,29 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
 
   it should "correctly retrieve the Cassandra series of ports from the Zookeeper cluster" in {
     instance.start()
+
     instance.richClient.getData(TestTable.zkPath, watch = false) successful {
       res => {
         info("Ports correctly retrieved from Cassandra.")
         new String(res.data) shouldEqual "localhost:9142"
+      }
+    }
+  }
+
+  it should "match the Zookeeper connector string to the spawned instance settings" in {
+    instance.start()
+    TestTable.connectorString shouldEqual instance.zookeeperConnectString
+  }
+
+  it should "correctly retrieve the Sequence of InetSocketAddresses from zookeeper" in {
+    val pairs = TestTable.hostnamePortPairs
+
+    TestTable.client.getData(TestTable.zkPath, watch = false).successful {
+      res => {
+        val data = new String(res.data)
+        data shouldEqual "localhost:9142"
+        Console.println(pairs)
+        pairs shouldEqual Seq(new InetSocketAddress("localhost", 9142))
       }
     }
   }

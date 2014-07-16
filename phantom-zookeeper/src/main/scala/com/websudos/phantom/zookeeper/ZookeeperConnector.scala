@@ -70,8 +70,13 @@ trait DefaultZookeeperConnector extends ZookeeperConnector {
     defaultAddress
   }
 
-  def hostnamePortPairs: Seq[InetSocketAddress] = Try {
+  lazy val hostnamePortPairs: Seq[InetSocketAddress] = Try {
+    Await.ready(client.connect(2.seconds), 2.seconds)
+
     val res = new String(Await.result(client.getData(zkPath, watch = false), 3.seconds).data)
+    ZookeeperManager.logger.info("Extracting Cassandra ports from ZooKeeper")
+    ZookeeperManager.logger.info(s"Parsing from $res")
+    Console.println(res)
 
     res.split("\\s*,\\s*").map(_.split(":")).map {
       case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
