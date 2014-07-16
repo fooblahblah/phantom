@@ -27,6 +27,7 @@ import com.twitter.common.io.FileUtils.createTempDir
 import com.twitter.common.quantity.{Amount, Time}
 import com.twitter.common.zookeeper.{ServerSetImpl, ZooKeeperClient}
 import com.twitter.conversions.time._
+
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
 import com.twitter.util.{Await, RandomSocket}
@@ -57,7 +58,6 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
   lazy val richClient = ZooKeeper.newRichClient(zookeeperConnectString)
 
   def start() {
-
     connectionFactory.startup(zookeeperServer)
 
     zookeeperClient = new ZooKeeperClient(
@@ -79,5 +79,6 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
   def stop() {
     connectionFactory.shutdown()
     zookeeperClient.close()
+    Await.ready(richClient.close(), 2.seconds)
   }
 }

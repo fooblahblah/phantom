@@ -28,8 +28,8 @@ import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
 
 import com.datastax.driver.core.Session
-import com.twitter.util.Try
-import com.websudos.phantom.zookeeper.{ZookeeperInstance, DefaultZookeeperConnector}
+import com.twitter.util.NonFatal
+import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance, ZookeeperManager => Manager }
 
 
 private[testing] object ZookeperManager {
@@ -44,7 +44,7 @@ private[testing] object ZookeperManager {
   }
 }
 
-trait CassandraTest {
+trait CassandraTest extends DefaultZookeeperConnector with ScalaFutures with Matchers with Assertions with AsyncAssertions {
   self: BeforeAndAfterAll =>
 
   ZookeperManager.start()
@@ -63,16 +63,18 @@ trait CassandraTest {
   }
 
   override def beforeAll() {
-    Try {
+    try {
       EmbeddedCassandraServerHelper.mkdirs()
+    } catch {
+      case NonFatal(e) => Manager.logger.error(e.getMessage)
     }
     EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     createKeySpace(keySpace)
   }
 }
 
-trait BaseTest extends FlatSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest with DefaultZookeeperConnector
+trait BaseTest extends FlatSpec with BeforeAndAfterAll with CassandraTest
 
-trait FeatureBaseTest extends FeatureSpec with ScalaFutures with BeforeAndAfterAll with Matchers with Assertions with AsyncAssertions with CassandraTest with DefaultZookeeperConnector
+trait FeatureBaseTest extends FeatureSpec with BeforeAndAfterAll with CassandraTest
 
 

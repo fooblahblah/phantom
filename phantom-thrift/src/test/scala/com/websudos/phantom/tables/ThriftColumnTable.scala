@@ -18,7 +18,6 @@ package com.websudos.phantom.tables
 import com.datastax.driver.core.Row
 import com.websudos.phantom.helper.TestSampler
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.keys.PartitionKey
 import com.websudos.phantom.thrift.{
   OptionalThriftColumn,
   ThriftColumn,
@@ -28,6 +27,7 @@ import com.websudos.phantom.thrift.{
   ThriftTest
 }
 import com.twitter.scrooge.CompactThriftSerializer
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 case class Output(
   id: Int, name: String,
@@ -85,4 +85,4 @@ sealed class ThriftColumnTable extends CassandraTable[ThriftColumnTable, Output]
   }
 }
 
-object ThriftColumnTable extends ThriftColumnTable with TestSampler[ThriftColumnTable, Output] {}
+object ThriftColumnTable extends ThriftColumnTable with TestSampler[ThriftColumnTable, Output] with DefaultZookeeperConnector
