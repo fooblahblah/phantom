@@ -22,8 +22,6 @@ import java.net.InetSocketAddress
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.twitter.conversions.time._
-import com.twitter.util.Await
 
 object TestTable extends DefaultZookeeperConnector
 
