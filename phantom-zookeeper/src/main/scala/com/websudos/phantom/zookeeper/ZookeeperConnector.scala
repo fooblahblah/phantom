@@ -47,7 +47,7 @@ trait ZookeeperConnector {
 
   lazy val client = ZooKeeper.newRichClient(connectorString)
 
-  implicit lazy val session: Session = blocking {
+  lazy val session: Session = blocking {
     cluster.connect(keySpace)
   }
 

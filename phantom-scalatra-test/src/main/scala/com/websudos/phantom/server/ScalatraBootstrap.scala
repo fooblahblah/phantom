@@ -17,14 +17,13 @@ package com.websudos.phantom.server
 
 import javax.servlet.ServletContext
 
-import com.websudos.phantom.Implicits._
-import org.joda.time.{DateTime, LocalDate}
-import org.scalatra.LifeCycle
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import org.joda.time.{DateTime, LocalDate}
+import org.scalatra.LifeCycle
+
+import com.websudos.phantom.Implicits._
 
 object ScalatraBootstrap {
   val now = new DateTime()
@@ -51,7 +50,7 @@ object ScalatraBootstrap {
   )
 }
 
-class ScalatraBootstrap extends LifeCycle with DefaultZookeeperConnector {
+class ScalatraBootstrap extends LifeCycle {
 
   override def init(context: ServletContext) {
     // Create cassandra keyspace in startup

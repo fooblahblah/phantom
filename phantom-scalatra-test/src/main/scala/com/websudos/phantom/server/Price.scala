@@ -1,13 +1,13 @@
 package com.websudos.phantom.server
 
 import java.util.Date
+import scala.concurrent.Future
+import org.joda.time.{DateTime, LocalDate}
 
-import com.datastax.driver.core.Row
+import com.datastax.driver.core.{ ResultSet, Row }
 import com.newzly.util.testing.Sampler
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.helper.{ModelSampler, TestSampler}
-import org.joda.time.{DateTime, LocalDate}
-
 import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 
@@ -71,6 +71,8 @@ sealed class OptionPrices extends CassandraTable[OptionPrices, OptionPrice] {
 object EquityPrices extends EquityPrices with TestSampler[EquityPrices, EquityPrice] with ModelSampler[EquityPrice] with DefaultZookeeperConnector {
   override val tableName: String = "EquityPrices"
 
+  val keySpace = "phantom"
+
   override def sample: EquityPrice = EquityPrice(
     Sampler.getARandomString,
     new LocalDate(),
@@ -92,6 +94,8 @@ object EquityPrices extends EquityPrices with TestSampler[EquityPrices, EquityPr
 object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPrice] with ModelSampler[OptionPrice] with DefaultZookeeperConnector {
   override val tableName: String = "OptionPrices"
 
+  val keySpace = "phantom"
+
   override def sample: OptionPrice = OptionPrice(
     Sampler.getARandomString,
     new LocalDate(),
@@ -101,12 +105,15 @@ object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPr
     BigDecimal(Sampler.getARandomInteger())
   )
 
-  def insertPrice(price: OptionPrice) =
-    insert.
-      value(_.instrumentId, price.instrumentId).
-      value(_.tradeDate, price.tradeDate.toDate).
-      value(_.exchangeCode, price.exchangeCode).
-      value(_.t, price.t).
-      value(_.strikePrice, price.strikePrice).
-      value(_.value, price.value)
+  def insertPrice(price: OptionPrice): Future[ResultSet] = {
+    insert
+      .value(_.instrumentId, price.instrumentId)
+      .value(_.tradeDate, price.tradeDate.toDate)
+      .value(_.exchangeCode, price.exchangeCode)
+      .value(_.t, price.t)
+      .value(_.strikePrice, price.strikePrice)
+      .value(_.value, price.value)
+      .future()
+  }
+
 }
