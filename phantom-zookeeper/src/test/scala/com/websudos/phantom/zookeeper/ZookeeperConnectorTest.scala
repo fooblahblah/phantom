@@ -23,7 +23,9 @@ import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 
-object TestTable extends DefaultZookeeperConnector
+object TestTable extends DefaultZookeeperConnector {
+  val keySpace = "phantom"
+}
 
 class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterAll {
   val instance = new ZookeeperInstance()

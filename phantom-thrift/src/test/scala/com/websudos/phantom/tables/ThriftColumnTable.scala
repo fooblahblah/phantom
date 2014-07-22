@@ -85,4 +85,6 @@ sealed class ThriftColumnTable extends CassandraTable[ThriftColumnTable, Output]
   }
 }
 
-object ThriftColumnTable extends ThriftColumnTable with TestSampler[ThriftColumnTable, Output] with DefaultZookeeperConnector
+object ThriftColumnTable extends ThriftColumnTable with TestSampler[ThriftColumnTable, Output] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+}

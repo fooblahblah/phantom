@@ -1,13 +1,14 @@
 package com.websudos.phantom.server
 
 import java.util.Date
-import scala.concurrent.Future
+
 import org.joda.time.{DateTime, LocalDate}
 
-import com.datastax.driver.core.{ ResultSet, Row }
+import com.datastax.driver.core.Row
 import com.newzly.util.testing.Sampler
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.helper.{ModelSampler, TestSampler}
+import com.websudos.phantom.query.InsertQuery
 import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 
@@ -105,7 +106,7 @@ object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPr
     BigDecimal(Sampler.getARandomInteger())
   )
 
-  def insertPrice(price: OptionPrice): Future[ResultSet] = {
+  def insertPrice(price: OptionPrice): InsertQuery[OptionPrices, OptionPrice] = {
     insert
       .value(_.instrumentId, price.instrumentId)
       .value(_.tradeDate, price.tradeDate.toDate)
@@ -113,7 +114,6 @@ object OptionPrices extends OptionPrices with TestSampler[OptionPrices, OptionPr
       .value(_.t, price.t)
       .value(_.strikePrice, price.strikePrice)
       .value(_.value, price.value)
-      .future()
   }
 
 }
