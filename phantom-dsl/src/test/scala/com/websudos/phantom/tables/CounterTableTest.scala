@@ -21,6 +21,7 @@ import com.datastax.driver.core.utils.UUIDs
 import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
 import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 case class CounterRecord(id: UUID, count: Long)
 
@@ -41,7 +42,9 @@ class CounterTableTest extends CassandraTable[CounterTableTest, CounterRecord] {
   }
 }
 
-object CounterTableTest extends CounterTableTest with TestSampler[CounterTableTest, CounterRecord] {
+object CounterTableTest extends CounterTableTest with TestSampler[CounterTableTest, CounterRecord] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+
   override val tableName = "counter_column_tests"
 }
 
@@ -54,6 +57,8 @@ class SecondaryCounterTable extends CassandraTable[SecondaryCounterTable, Counte
   }
 }
 
-object SecondaryCounterTable extends SecondaryCounterTable with TestSampler[SecondaryCounterTable, CounterRecord] {
+object SecondaryCounterTable extends SecondaryCounterTable with TestSampler[SecondaryCounterTable, CounterRecord]  with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+
   override val tableName = "secondary_column_tests"
 }

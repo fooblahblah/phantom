@@ -20,6 +20,7 @@ import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
 import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 case class MyTestRow(
   key: String,
@@ -48,7 +49,9 @@ sealed class MyTest extends CassandraTable[MyTest, MyTestRow] {
 
 }
 
-object MyTest extends MyTest with TestSampler[MyTest, MyTestRow] {
+object MyTest extends MyTest with TestSampler[MyTest, MyTestRow] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+
   override val tableName = "mytest"
 
 }

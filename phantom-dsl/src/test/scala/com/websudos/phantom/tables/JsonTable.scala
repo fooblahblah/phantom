@@ -23,8 +23,10 @@ import java.util.UUID
 import com.datastax.driver.core.Row
 import com.datastax.driver.core.utils.UUIDs
 import com.newzly.util.testing.Sampler
+
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.helper.{ModelSampler, TestSampler}
+import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 import net.liftweb.json.{ DefaultFormats, Extraction, JsonParser, pretty, render }
 
@@ -96,7 +98,8 @@ class JsonTable extends CassandraTable[JsonTable, JsonClass] {
   }
 }
 
-object JsonTable extends JsonTable with TestSampler[JsonTable, JsonClass] {
+object JsonTable extends JsonTable with TestSampler[JsonTable, JsonClass] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
 
   def sample: JsonClass = {
     JsonClass(

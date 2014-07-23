@@ -18,6 +18,7 @@
 
 package com.websudos.phantom.testing
 
+import java.net.ServerSocket
 import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +31,6 @@ import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matc
 import com.datastax.driver.core.Session
 import com.twitter.util.{Try, NonFatal}
 import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance, ZookeeperManager => Manager }
-import java.net.ServerSocket
 
 
 private[testing] object ZookeperManager {
@@ -58,8 +58,6 @@ trait CassandraTest extends DefaultZookeeperConnector with ScalaFutures with Mat
   self: BeforeAndAfterAll =>
 
   ZookeperManager.start()
-
-  val keySpace: String
 
   val session: Session
 
