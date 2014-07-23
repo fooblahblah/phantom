@@ -90,7 +90,7 @@ object phantom extends Build {
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
     organization := "com.websudos",
-    version := "0.9.4",
+    version := "0.9.7",
     scalaVersion := "2.10.4",
     resolvers ++= Seq(
       "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",

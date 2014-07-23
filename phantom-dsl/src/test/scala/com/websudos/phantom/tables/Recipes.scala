@@ -21,6 +21,7 @@ import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
 import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 case class Recipe(
   url: String,
@@ -76,7 +77,9 @@ sealed class Recipes extends CassandraTable[Recipes, Recipe] {
   object uid extends UUIDColumn(this)
 }
 
-object Recipes extends Recipes with TestSampler[Recipes, Recipe] {
+object Recipes extends Recipes with TestSampler[Recipes, Recipe] with DefaultZookeeperConnector {
   override def tableName = "Recipes"
+
+  val keySpace = "phantom"
 
 }

@@ -21,6 +21,7 @@ import com.datastax.driver.core.utils.UUIDs
 import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
 import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 
 case class SecondaryIndexRecord(primary: UUID, secondary: UUID, name: String)
@@ -46,4 +47,6 @@ sealed class SecondaryIndexTable extends CassandraTable[SecondaryIndexTable, Sec
   )
 }
 
-object SecondaryIndexTable extends SecondaryIndexTable with TestSampler[SecondaryIndexTable, SecondaryIndexRecord]
+object SecondaryIndexTable extends SecondaryIndexTable with TestSampler[SecondaryIndexTable, SecondaryIndexRecord] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+}

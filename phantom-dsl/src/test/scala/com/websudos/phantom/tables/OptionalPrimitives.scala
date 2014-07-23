@@ -22,6 +22,7 @@ import com.websudos.phantom.CassandraTable
 import com.websudos.phantom.helper.{ ModelSampler, TestSampler}
 import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
 
 case class OptionalPrimitive(
   pkey: String,
@@ -95,6 +96,8 @@ sealed class OptionalPrimitives extends CassandraTable[OptionalPrimitives, Optio
   object bi extends OptionalBigIntColumn(this)
 }
 
-object OptionalPrimitives extends OptionalPrimitives with TestSampler[OptionalPrimitives, OptionalPrimitive] {
+object OptionalPrimitives extends OptionalPrimitives with TestSampler[OptionalPrimitives, OptionalPrimitive] with DefaultZookeeperConnector {
+  val keySpace = "phantom"
+
   override val tableName = "OptionalPrimitives"
 }
