@@ -15,6 +15,8 @@ object phantom extends Build {
   val thriftVersion = "0.9.1"
   val scalatraVersion = "2.2.2"
 
+  val publishUrl = "http://newzly-artifactory.elasticbeanstalk.com/artifactory"
+
 
   val mavenPublishSettings : Seq[Def.Setting[_]] = Seq(
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
@@ -57,8 +59,13 @@ object phantom extends Build {
   )
 
   val publishSettings : Seq[Def.Setting[_]] = Seq(
-    publishTo := Some("newzly releases" at "http://maven.newzly.com/repository/internal"),
-    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+    publishTo <<= version { (v: String) => {
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at publishUrl + "/libs-snapshot-local")
+        else
+          Some("releases"  at publishUrl + "/libs-release-local")
+      }
+    },
     publishMavenStyle := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => true },
@@ -90,7 +97,7 @@ object phantom extends Build {
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
     organization := "com.websudos",
-    version := "0.9.4",
+    version := "0.9.6",
     scalaVersion := "2.10.4",
     resolvers ++= Seq(
       "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
@@ -132,7 +139,6 @@ object phantom extends Build {
     phantomDsl,
     phantomExample,
     phantomScalatraTest,
-    phantomSpark,
     phantomTesting,
     phantomThrift,
     phantomUdt,
@@ -165,7 +171,7 @@ object phantom extends Build {
       "net.liftweb"                  %% "lift-json"                         % "2.6-M4"                  % "test, provided"
     )
   ).dependsOn(
-    phantomTesting
+    phantomTesting % "test, provided"
   )
 
   lazy val phantomUdt = Project(
@@ -179,7 +185,7 @@ object phantom extends Build {
     )
   ).dependsOn(
     phantomDsl,
-    phantomTesting
+    phantomTesting % "test, provided"
   )
 
 
@@ -195,7 +201,7 @@ object phantom extends Build {
     )
   ).dependsOn(
     phantomDsl,
-    phantomTesting
+    phantomTesting % "test, provided"
   )
 
   lazy val phantomThrift = Project(
@@ -217,7 +223,7 @@ object phantom extends Build {
     )
   ).dependsOn(
     phantomDsl,
-    phantomTesting
+    phantomTesting % "test, provided"
   )
 
   lazy val phantomZookeeper = Project(
@@ -300,6 +306,6 @@ object phantom extends Build {
     phantomDsl,
     phantomThrift,
     phantomZookeeper,
-    phantomTesting
+    phantomTesting % "test, provided"
   )
 }
