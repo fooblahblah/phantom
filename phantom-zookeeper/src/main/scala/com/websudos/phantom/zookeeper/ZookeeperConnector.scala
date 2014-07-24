@@ -71,7 +71,7 @@ trait DefaultZookeeperConnector extends ZookeeperConnector {
       defaultAddress
     }
   } else {
-    ZookeeperManager.logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as defaults.")
+    ZookeeperManager.logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as default.")
     defaultAddress
   }
 

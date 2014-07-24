@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.websudos.phantom.dsl.specialized
+package com.websudos.phantom.thrift
 
 import scala.concurrent.blocking
 import org.scalatest.concurrent.PatienceConfiguration
@@ -26,7 +26,6 @@ import com.newzly.util.testing.Sampler
 import com.websudos.phantom.testing.BaseTest
 
 class ThriftListOperations extends BaseTest {
-  val keySpace = "thriftlistoperations"
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

@@ -33,7 +33,6 @@ class OptionalThriftColumnTest extends BaseTest {
     }
   }
 
-  val keySpace = "optional_thrift_columns"
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   it should "find an item if it was defined" in {

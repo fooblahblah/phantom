@@ -15,16 +15,15 @@
  */
 package com.websudos.phantom.dsl.ordering
 
-import com.websudos.phantom.Implicits._
-import com.websudos.phantom.iteratee.Iteratee
-import com.websudos.phantom.tables.{TimeSeriesRecord, TimeSeriesTable}
-import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
-import org.scalatest.BeforeAndAfterEach
-import org.scalatest.concurrent.PatienceConfiguration
-import scala.collection.JavaConverters._
 import scala.concurrent.blocking
 import scala.concurrent.duration._
+
+import org.scalatest.concurrent.PatienceConfiguration
+
+import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.tables.{TimeSeriesRecord, TimeSeriesTable}
+import com.websudos.phantom.testing.BaseTest
 
 class TimeSeriesTest extends BaseTest {
 

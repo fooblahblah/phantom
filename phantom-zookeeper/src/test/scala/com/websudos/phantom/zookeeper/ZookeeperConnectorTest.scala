@@ -85,4 +85,11 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
     }
   }
 
+  it should "correctly parse multiple pairs of hostname:port from Zookeeper" in {
+    val chain = for {
+      set <- TestTable.client.setData(TestTable.zkPath, "localhost:9142, localhost:9900, 127.131.211.23:3402".getBytes, -1)
+      get <- TestTable.client.getData("/cassandra", watch = false)
+    } yield new String(get.data)
+  }
+
 }

@@ -19,7 +19,6 @@
 package com.websudos.phantom.testing
 
 import java.net.ServerSocket
-import java.util.concurrent.atomic.AtomicBoolean
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,11 +34,12 @@ import com.websudos.phantom.zookeeper.{ZookeeperInstance, ZookeeperManager => Ma
 private[testing] object ZookeperManager {
   lazy val zkInstance = new ZookeeperInstance()
 
-  private[this] val isStarted = new AtomicBoolean(false)
+  private[this] var isStarted = false
 
   def start(): Unit = {
-    if (isStarted.compareAndSet(false, true)) {
+    if (!isStarted) {
       zkInstance.start()
+      isStarted = true
     }
   }
 
@@ -61,13 +61,15 @@ trait CassandraTest extends ScalaFutures with Matchers with Assertions with Asyn
   implicit lazy val context: ExecutionContext = global
 
   override def beforeAll() {
-    if (!ZookeperManager.isCassandraStarted) {
-      try {
-        EmbeddedCassandraServerHelper.mkdirs()
-      } catch {
-        case NonFatal(e) => Manager.logger.error(e.getMessage)
+    synchronized {
+      if (!ZookeperManager.isCassandraStarted) {
+        try {
+          EmbeddedCassandraServerHelper.mkdirs()
+        } catch {
+          case NonFatal(e) => Manager.logger.error(e.getMessage)
+        }
+        EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
       }
-      EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     }
   }
 }
