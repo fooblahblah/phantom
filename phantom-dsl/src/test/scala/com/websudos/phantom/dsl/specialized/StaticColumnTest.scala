@@ -11,7 +11,6 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class StaticColumnTest extends BaseTest {
-  val keySpace = "static_columns_test"
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
@@ -23,9 +22,6 @@ class StaticColumnTest extends BaseTest {
   }
 
   it should "use a static value for a static column" in {
-
-    //char is not supported
-    //https://github.com/datastax/java-driver/blob/2.0/driver-core/src/main/java/com/datastax/driver/core/DataType.java
 
     val id = UUIDs.timeBased()
     val static = "this_is_static"
@@ -46,8 +42,7 @@ class StaticColumnTest extends BaseTest {
   }
 
   it should "update values in all rows" in {
-    //char is not supported
-    //https://github.com/datastax/java-driver/blob/2.0/driver-core/src/main/java/com/datastax/driver/core/DataType.java
+
     val id = UUIDs.timeBased()
     val static = "this_is_static"
     val static2 = "this_is_updated_static"

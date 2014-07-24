@@ -30,7 +30,7 @@ import com.websudos.phantom.testing.BaseTest
 
 
 class UpdateTest extends BaseTest with Matchers with Assertions with AsyncAssertions {
-  val keySpace: String = "UpdateTest"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(20 seconds)
 
   "Update" should "work fine for primitives columns" in {

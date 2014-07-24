@@ -21,16 +21,15 @@ package com.websudos.phantom.testing
 import java.net.ServerSocket
 import java.util.concurrent.atomic.AtomicBoolean
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, blocking}
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper
 import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
 
-import com.datastax.driver.core.Session
-import com.twitter.util.{Try, NonFatal}
-import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance, ZookeeperManager => Manager }
+import com.twitter.util.{NonFatal, Try}
+import com.websudos.phantom.zookeeper.{ZookeeperInstance, ZookeeperManager => Manager}
 
 
 private[testing] object ZookeperManager {
@@ -54,21 +53,12 @@ private[testing] object ZookeperManager {
   }
 }
 
-trait CassandraTest extends DefaultZookeeperConnector with ScalaFutures with Matchers with Assertions with AsyncAssertions {
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions {
   self: BeforeAndAfterAll =>
 
   ZookeperManager.start()
 
-  val session: Session
-
   implicit lazy val context: ExecutionContext = global
-
-  private[this] def createKeySpace(spaceName: String) = {
-    blocking {
-      session.execute(s"CREATE KEYSPACE IF NOT EXISTS $spaceName WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
-      session.execute(s"use $spaceName;")
-    }
-  }
 
   override def beforeAll() {
     if (!ZookeperManager.isCassandraStarted) {
@@ -79,7 +69,6 @@ trait CassandraTest extends DefaultZookeeperConnector with ScalaFutures with Mat
       }
       EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
     }
-    createKeySpace(keySpace)
   }
 }
 

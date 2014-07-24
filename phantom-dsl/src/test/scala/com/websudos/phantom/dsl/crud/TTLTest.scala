@@ -24,7 +24,6 @@ import com.websudos.phantom.testing.BaseTest
 import com.twitter.util.Duration
 
 class TTLTest extends BaseTest {
-  val keySpace: String = "TTLTest"
 
   implicit val s: PatienceConfiguration.Timeout = timeout(20 seconds)
 

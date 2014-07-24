@@ -23,7 +23,7 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class TruncateTest extends BaseTest {
-  val keySpace: String = "truncate_test"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {

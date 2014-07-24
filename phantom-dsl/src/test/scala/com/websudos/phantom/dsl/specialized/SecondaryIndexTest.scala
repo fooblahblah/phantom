@@ -25,8 +25,6 @@ import com.websudos.phantom.testing.BaseTest
 
 class SecondaryIndexTest extends BaseTest {
 
-  val keySpace = "phantom"
-
   override def beforeAll(): Unit = {
     blocking {
       super.beforeAll()

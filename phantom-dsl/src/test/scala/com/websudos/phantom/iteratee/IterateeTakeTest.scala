@@ -23,7 +23,7 @@ import com.websudos.phantom.testing.BaseTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class IterateeTakeTest extends BaseTest {
-  val keySpace: String = "iteratee_take_tests"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(2 minutes)
 
   ignore should "take records from the iterator" in {

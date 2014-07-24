@@ -24,7 +24,7 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class IterateeTest extends BaseTest {
-  val keySpace: String = "IterateeTestSpace"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(2 minutes)
 
   ignore should "get result fine" in {

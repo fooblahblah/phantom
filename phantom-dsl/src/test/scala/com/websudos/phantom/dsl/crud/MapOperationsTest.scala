@@ -26,7 +26,6 @@ import com.websudos.phantom.testing.BaseTest
 
 class MapOperationsTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
-  val keySpace = "map_operators"
 
   override def beforeAll(): Unit = {
     blocking {

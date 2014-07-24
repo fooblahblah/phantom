@@ -28,7 +28,6 @@ import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.JsonTable
 
 class JsonColumnTest extends BaseTest {
-  val keySpace = "json_columns"
 
   override def beforeAll(): Unit = {
     super.beforeAll()

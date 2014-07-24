@@ -25,7 +25,6 @@ import com.websudos.phantom.testing.BaseTest
 
 class DeleteTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
-  val keySpace: String = "deleteTest"
 
   override def beforeAll(): Unit = {
     blocking {

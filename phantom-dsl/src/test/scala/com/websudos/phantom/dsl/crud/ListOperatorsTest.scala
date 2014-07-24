@@ -30,7 +30,6 @@ import com.websudos.phantom.testing.BaseTest
 
 class ListOperatorsTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
-  val keySpace = "listoperators"
 
   override def beforeAll(): Unit = {
     blocking {

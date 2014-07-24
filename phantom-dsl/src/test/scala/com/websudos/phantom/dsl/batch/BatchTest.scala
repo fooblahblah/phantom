@@ -28,7 +28,6 @@ import com.websudos.phantom.testing.BaseTest
 
 
 class BatchTest extends BaseTest {
-  val keySpace: String = "batch_tests"
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

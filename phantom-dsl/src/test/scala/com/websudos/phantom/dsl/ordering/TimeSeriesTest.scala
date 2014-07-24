@@ -27,7 +27,6 @@ import scala.concurrent.blocking
 import scala.concurrent.duration._
 
 class TimeSeriesTest extends BaseTest {
-  val keySpace = "clustering_order_tests"
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

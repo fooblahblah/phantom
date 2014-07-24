@@ -24,7 +24,7 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class CounterColumnTest extends BaseTest {
-  val keySpace = "counter_column_test"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {

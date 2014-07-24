@@ -25,7 +25,6 @@ import com.websudos.phantom.testing.BaseTest
 
 class SelectOptionalTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
-  val keySpace: String = "selectOptionalTest"
 
   override def beforeAll(): Unit = {
     blocking {

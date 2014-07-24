@@ -9,7 +9,7 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class SkippingRecordsTest extends BaseTest {
-  val keySpace: String = "SkippingRecordsTest"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(20 seconds)
 
   override def beforeAll(): Unit = {

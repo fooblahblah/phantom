@@ -24,7 +24,6 @@ import com.newzly.util.testing.Sampler
 import com.websudos.phantom.testing.BaseTest
 
 class InOperatorTest extends BaseTest {
-  val keySpace = "in_operators_test"
 
   override def beforeAll(): Unit = {
     blocking {

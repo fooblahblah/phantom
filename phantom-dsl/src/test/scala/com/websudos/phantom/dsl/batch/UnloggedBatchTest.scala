@@ -27,14 +27,14 @@ import com.websudos.phantom.testing.BaseTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class UnloggedBatchTest extends BaseTest {
-  val keySpace: String = "BatchTestSpace"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
     blocking {
       super.beforeAll()
-      PrimitivesJoda.insertSchema()
     }
+    PrimitivesJoda.insertSchema()
   }
 
   it should "get the correct count for batch queries" in {

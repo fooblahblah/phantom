@@ -30,7 +30,6 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class InsertCasTest extends BaseTest {
-  val keySpace: String = "InsertTestKeySpace"
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {

@@ -25,7 +25,6 @@ import com.newzly.util.testing.Sampler
 
 
 class ConditionalQueries extends BaseTest {
-  val keySpace = "conditional_queries"
 
   override def beforeAll(): Unit = {
     blocking {

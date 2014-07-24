@@ -23,7 +23,7 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class IterateeSliceTest extends BaseTest {
-  val keySpace: String = "iteratee_slice_tests"
+
   implicit val s: PatienceConfiguration.Timeout = timeout(2 minutes)
 
   ignore should "get a slice of the iterator" in {
