@@ -15,7 +15,7 @@ object phantom extends Build {
   val thriftVersion = "0.9.1"
   val scalatraVersion = "2.2.2"
 
-  val publishUrl = "http://newzly-artifactory.elasticbeanstalk.com/artifactory"
+  val publishUrl = "http://newzly-artifactory.elasticbeanstalk.com"
 
 
   val mavenPublishSettings : Seq[Def.Setting[_]] = Seq(
@@ -59,40 +59,17 @@ object phantom extends Build {
   )
 
   val publishSettings : Seq[Def.Setting[_]] = Seq(
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
     publishTo <<= version { (v: String) => {
         if (v.trim.endsWith("SNAPSHOT"))
-          Some("snapshots" at publishUrl + "/libs-snapshot-local")
+          Some("snapshots" at publishUrl + "/ext-snapshot-local")
         else
-          Some("releases"  at publishUrl + "/libs-release-local")
+          Some("releases"  at publishUrl + "/ext-release-local")
       }
     },
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    pomIncludeRepository := { _ => true },
-    pomExtra := <url>https://github.com/websudosuk/phantom</url>
-      <licenses>
-        <license>
-          <name>Apache V2 License</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-      <scm>
-        <url>git@github.com:websudosuk/phantom.git</url>
-        <connection>scm:git:git@github.com:newzly/phantom.git</connection>
-      </scm>
-      <developers>
-        <developer>
-          <id>creyer</id>
-          <name>Sorin Chiprian</name>
-          <url>http://github.com/creyer</url>
-        </developer>
-        <developer>
-          <id>alexflav</id>
-          <name>Flavian Alexandru</name>
-          <url>http://github.com/alexflav23</url>
-        </developer>
-      </developers>
+    pomIncludeRepository := { _ => true }
   )
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
@@ -198,7 +175,7 @@ object phantom extends Build {
   ).settings(
     name := "phantom-spark",
     libraryDependencies ++= Seq(
-      "com.datastax.spark"           %% "spark-cassandra-connector"         % "1.0.0-beta1"
+      "com.datastax.spark"           %% "spark-cassandra-connector"         % "1.0.0-beta1" exclude("com.datastax.cassandra", "cassandra-driver-core")
     )
   ).dependsOn(
     phantomDsl,
