@@ -24,7 +24,8 @@ import com.newzly.util.testing.Sampler
 import com.websudos.phantom.testing.BaseTest
 
 class SecondaryIndexTest extends BaseTest {
-  val keySpace = "secondary_index_test"
+
+  val keySpace = "phantom"
 
   override def beforeAll(): Unit = {
     blocking {

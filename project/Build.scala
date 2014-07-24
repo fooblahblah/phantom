@@ -74,7 +74,7 @@ object phantom extends Build {
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
     organization := "com.websudos",
-    version := "0.9.7",
+    version := "0.9.8",
     scalaVersion := "2.10.4",
     resolvers ++= Seq(
       "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
@@ -85,10 +85,11 @@ object phantom extends Build {
       "Sonatype staging"                 at "http://oss.sonatype.org/content/repositories/staging",
       "Java.net Maven2 Repository"       at "http://download.java.net/maven/2/",
       "Twitter Repository"               at "http://maven.twttr.com",
-      "newzly snapshots"                 at "http://maven.newzly.com/repository/snapshots",
-      "newzly repository"                at "http://maven.newzly.com/repository/internal"
+      "newzly Libs snapshots"            at "http://newzly-artifactory.elasticbeanstalk.com/libs-release-local",
+      "newzly Libs"                      at "http://newzly-artifactory.elasticbeanstalk.com/libs-snapshot-local",
+      "newzly External snapshots"        at "http://newzly-artifactory.elasticbeanstalk.com/ext-release-local",
+      "newzly External"                  at "http://newzly-artifactory.elasticbeanstalk.com/ext-snapshot-local"
     ),
-    unmanagedSourceDirectories in Compile <<= (scalaSource in Compile)(Seq(_)),
     scalacOptions ++= Seq(
       "-language:postfixOps",
       "-language:implicitConversions",

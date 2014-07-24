@@ -48,7 +48,10 @@ trait ZookeeperConnector {
   lazy val client = ZooKeeper.newRichClient(connectorString)
 
   implicit lazy val session: Session = blocking {
-    cluster.connect(keySpace)
+    val s = cluster.connect()
+    s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
+    s.execute(s"use $keySpace;")
+    s
   }
 
 }
