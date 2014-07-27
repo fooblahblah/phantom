@@ -212,6 +212,7 @@ object phantom extends Build {
   ).settings(
     name := "phantom-zookeeper",
     libraryDependencies ++= Seq(
+      "org.xerial.snappy"            % "snappy-java"                        % "1.1.1.3",
       "org.scalatest"                %% "scalatest"                         % scalatestVersion,
       "com.datastax.cassandra"       %  "cassandra-driver-core"             % datastaxDriverVersion,
       "com.twitter"                  %% "finagle-serversets"                % finagleVersion,

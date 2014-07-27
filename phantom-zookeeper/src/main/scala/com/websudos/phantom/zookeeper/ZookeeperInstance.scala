@@ -29,17 +29,21 @@ import com.twitter.common.quantity.{Amount, Time}
 import com.twitter.common.zookeeper.{ServerSetImpl, ZooKeeperClient}
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
-import com.twitter.finagle.zookeeper.ZkResolver
-import com.twitter.util.{Await, RandomSocket}
+import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
+import com.twitter.util.{Await, Future, RandomSocket, Try }
 
 class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSocket.nextAddress()) {
 
   private[this] val status = new AtomicBoolean(false)
 
+  def isStarted: Boolean = status.get()
+
   val zookeeperAddress = address
   val zookeeperConnectString  = zookeeperAddress.getHostName + ":" + zookeeperAddress.getPort
 
   protected[this] val envString = "TEST_ZOOKEEPER_CONNECTOR"
+
+  val zkPath = "/cassandra"
 
   lazy val connectionFactory: NIOServerCnxn.Factory = new NIOServerCnxn.Factory(zookeeperAddress)
   lazy val txn = new FileTxnSnapLog(createTempDir(), createTempDir())
@@ -70,12 +74,13 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
         Amount.of(10, Time.MILLISECONDS),
         zookeeperAddress)
 
-      val serverSet = new ServerSetImpl(zookeeperClient, "/cassandra")
+      val serverSet = new ServerSetImpl(zookeeperClient, zkPath)
+      val cluster: ZookeeperServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
-      val cluster = new ZkResolver().resolve(Set(zookeeperAddress), "/cassandra", None, None)
+      cluster.join(zookeeperAddress)
 
       Await.ready(richClient.connect(2.seconds), 2.seconds)
-      Await.ready(richClient.setData("/cassandra", "localhost:9142".getBytes, -1), 3.seconds)
+      Await.ready(richClient.setData(zkPath, "localhost:9142".getBytes, -1), 3.seconds)
 
       // Disable noise from zookeeper logger
       java.util.logging.LogManager.getLogManager.reset()
@@ -88,5 +93,14 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
       zookeeperClient.close()
       Await.ready(richClient.close(), 2.seconds)
     }
+  }
+
+  def hostnamePortPairs: Future[Seq[InetSocketAddress]] = richClient.getData(zkPath, watch = false) map {
+    res => Try {
+      val data = new String(res.data)
+      data.split("\\s*,\\s*").map(_.split(":")).map {
+        case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
+      }.toSeq
+    } getOrElse Seq.empty[InetSocketAddress]
   }
 }
