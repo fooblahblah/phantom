@@ -20,7 +20,6 @@ import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.ThriftColumnTable
-import com.websudos.phantom.thrift.ThriftTest
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
 import com.websudos.phantom.testing.BaseTest

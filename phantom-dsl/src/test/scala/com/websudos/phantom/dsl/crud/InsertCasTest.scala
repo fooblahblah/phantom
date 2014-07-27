@@ -30,16 +30,15 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.testing.BaseTest
 
 class InsertCasTest extends BaseTest {
+
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      Primitives.insertSchema()
-      TestTable.insertSchema()
-      MyTest.insertSchema()
-      Recipes.insertSchema()
-    }
+    super.beforeAll()
+    Primitives.insertSchema()
+    TestTable.insertSchema()
+    MyTest.insertSchema()
+    Recipes.insertSchema()
   }
 
   "Standard inserts" should "create multiple database entries" in {

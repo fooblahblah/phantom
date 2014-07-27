@@ -31,9 +31,7 @@ class UnloggedBatchTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-    }
+    super.beforeAll()
     PrimitivesJoda.insertSchema()
   }
 

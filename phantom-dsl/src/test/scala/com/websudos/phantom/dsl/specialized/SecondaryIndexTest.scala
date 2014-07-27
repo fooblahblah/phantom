@@ -15,21 +15,18 @@
  */
 package com.websudos.phantom.dsl.specialized
 
-import scala.concurrent.blocking
-import com.websudos.phantom.Implicits._
 import com.datastax.driver.core.exceptions.InvalidQueryException
-import com.websudos.phantom.tables.{ SecondaryIndexRecord, SecondaryIndexTable }
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.tables.{SecondaryIndexRecord, SecondaryIndexTable}
 import com.websudos.phantom.testing.BaseTest
 
 class SecondaryIndexTest extends BaseTest {
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      SecondaryIndexTable.insertSchema()
-    }
+    super.beforeAll()
+    SecondaryIndexTable.insertSchema()
   }
 
   it should "allow fetching a record by its secondary index" in {

@@ -81,5 +81,4 @@ object Recipes extends Recipes with TestSampler[Recipes, Recipe] with DefaultZoo
   override def tableName = "Recipes"
 
   val keySpace = "phantom"
-
 }

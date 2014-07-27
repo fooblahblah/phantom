@@ -21,15 +21,35 @@ package com.websudos.phantom.zookeeper
 
 import java.net.InetSocketAddress
 
-import scala.collection.JavaConverters._
 import scala.concurrent.blocking
 
-import com.datastax.driver.core.{ Cluster, Session }
+import com.datastax.driver.core.{Cluster, Session}
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.util.{Await, Try}
 
 trait ZookeeperConnector {
+
+  /**
+   * Boolean that keeps track of the connection status of the ZooKeeper rich client.
+   * The client doesn't maintain status for itself and doesn't connect automatically before retrieving data.
+   */
+  private[this] var connectionStatus = false
+
+  /**
+   * Allows extending classes to connect to the ZooKeeper server using the RichClient interface provided in this trait.
+   * The check is synchronized to prevent concurrent connection attempts which result in fatal errors.
+   */
+  protected[this] def connectIfNotConnected() = synchronized {
+    if (!connectionStatus) {
+      zkManager.logger.info("Connecting to Zookeeper instance")
+      Await.ready(client.connect(2.seconds), 2.seconds)
+      connectionStatus = true
+    } else {
+      zkManager.logger.info("Already connected to Zookeeper instance")
+    }
+  }
+
 
   protected[zookeeper] val envString = "TEST_ZOOKEEPER_CONNECTOR"
 
@@ -39,13 +59,17 @@ trait ZookeeperConnector {
 
   def zkAddress: InetSocketAddress
 
+  val zkManager: ZookeeperManager
+
   val keySpace: String
 
-  val cluster: Cluster
+  lazy val cluster: Cluster = zkManager.cluster
 
-  def connectorString = s"${zkAddress.getHostName}:${zkAddress.getPort}"
+  private[zookeeper] def connectorString = s"${zkAddress.getHostName}:${zkAddress.getPort}"
 
   lazy val client = ZooKeeper.newRichClient(connectorString)
+
+  def hostnamePortPairs: Seq[InetSocketAddress]
 
   implicit lazy val session: Session = blocking {
     val s = cluster.connect()
@@ -58,40 +82,35 @@ trait ZookeeperConnector {
 
 trait DefaultZookeeperConnector extends ZookeeperConnector {
 
+  val zkManager = new DefaultZookeeperManager(this)
+
   def zkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
     val inetPair: String = System.getProperty(envString)
     val split = inetPair.split(":")
 
     Try {
-      ZookeeperManager.logger.info(s"Using ZooKeeper settings from the $envString environment variable")
-      ZookeeperManager.logger.info(s"Connecting to ZooKeeper address: ${split(0)}:${split(1)}")
+      zkManager.logger.info(s"Using ZooKeeper settings from the $envString environment variable")
+      zkManager.logger.info(s"Connecting to ZooKeeper address: ${split(0)}:${split(1)}")
       new InetSocketAddress(split(0), split(1).toInt)
     } getOrElse {
-      ZookeeperManager.logger.warn(s"Failed to parse address from $envString environment variable with value: $inetPair")
+      zkManager.logger.warn(s"Failed to parse address from $envString environment variable with value: $inetPair")
       defaultAddress
     }
   } else {
-    ZookeeperManager.logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as default.")
+    zkManager.logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as default.")
     defaultAddress
   }
 
-  lazy val hostnamePortPairs: Seq[InetSocketAddress] = Try {
-    Await.ready(client.connect(2.seconds), 2.seconds)
-
+  def hostnamePortPairs: Seq[InetSocketAddress] = Try {
+    connectIfNotConnected()
     val res = new String(Await.result(client.getData(zkPath, watch = false), 3.seconds).data)
-    ZookeeperManager.logger.info("Extracting Cassandra ports from ZooKeeper")
-    ZookeeperManager.logger.info(s"Parsing from $res")
+    zkManager.logger.info("Extracting Cassandra ports from ZooKeeper")
+    zkManager.logger.info(s"Parsing from $res")
 
     res.split("\\s*,\\s*").map(_.split(":")).map {
       case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
     }.toSeq
 
   } getOrElse Seq.empty[InetSocketAddress]
-
-  lazy val cluster = Cluster.builder()
-    .addContactPointsWithPorts(hostnamePortPairs.asJava)
-    .withoutJMXReporting()
-    .withoutMetrics()
-    .build()
 
 }

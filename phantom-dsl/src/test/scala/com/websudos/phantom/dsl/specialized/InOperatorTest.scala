@@ -26,10 +26,8 @@ import com.websudos.phantom.testing.BaseTest
 class InOperatorTest extends BaseTest {
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      Recipes.insertSchema()
-    }
+    super.beforeAll()
+    Recipes.insertSchema()
   }
 
   it should "find a record with a in operator if the record exists" in {

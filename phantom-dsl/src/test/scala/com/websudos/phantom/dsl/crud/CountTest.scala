@@ -15,8 +15,6 @@
  */
 package com.websudos.phantom.dsl.crud
 
-import scala.concurrent.blocking
-
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
@@ -30,10 +28,8 @@ class CountTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      PrimitivesJoda.insertSchema()
-    }
+    super.beforeAll()
+    PrimitivesJoda.insertSchema()
   }
 
 

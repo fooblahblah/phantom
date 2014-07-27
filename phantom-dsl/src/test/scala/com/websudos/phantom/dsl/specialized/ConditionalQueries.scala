@@ -27,10 +27,8 @@ import com.newzly.util.testing.Sampler
 class ConditionalQueries extends BaseTest {
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      Recipes.insertSchema()
-    }
+    super.beforeAll()
+    Recipes.insertSchema()
   }
 
   it should "update the record if the optional column based condition matches" in {

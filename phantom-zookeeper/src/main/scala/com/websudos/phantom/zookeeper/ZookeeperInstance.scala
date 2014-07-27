@@ -28,9 +28,8 @@ import com.twitter.common.io.FileUtils.createTempDir
 import com.twitter.common.quantity.{Amount, Time}
 import com.twitter.common.zookeeper.{ServerSetImpl, ZooKeeperClient}
 import com.twitter.conversions.time._
-
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
-import com.twitter.finagle.zookeeper.ZookeeperServerSetCluster
+import com.twitter.finagle.zookeeper.ZkResolver
 import com.twitter.util.{Await, RandomSocket}
 
 class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSocket.nextAddress()) {
@@ -72,9 +71,8 @@ class ZookeeperInstance(private[this] val address: InetSocketAddress = RandomSoc
         zookeeperAddress)
 
       val serverSet = new ServerSetImpl(zookeeperClient, "/cassandra")
-      val cluster = new ZookeeperServerSetCluster(serverSet)
 
-      cluster.join(zookeeperAddress)
+      val cluster = new ZkResolver().resolve(Set(zookeeperAddress), "/cassandra", None, None)
 
       Await.ready(richClient.connect(2.seconds), 2.seconds)
       Await.ready(richClient.setData("/cassandra", "localhost:9142".getBytes, -1), 3.seconds)

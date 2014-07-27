@@ -20,15 +20,16 @@ package com.websudos.phantom.testing
 
 import java.net.ServerSocket
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, blocking}
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper
 import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
 
-import com.twitter.util.{NonFatal, Try}
-import com.websudos.phantom.zookeeper.{ZookeeperInstance, ZookeeperManager => Manager}
+import com.datastax.driver.core.Session
+import com.twitter.util.{ NonFatal, Try }
+import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance }
 
 
 private[testing] object ZookeperManager {
@@ -53,22 +54,31 @@ private[testing] object ZookeperManager {
   }
 }
 
-trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions {
+
+trait TestZookeeperManager extends DefaultZookeeperConnector {
+  val keySpace = "phantom"
+}
+
+
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with TestZookeeperManager {
   self: BeforeAndAfterAll =>
 
   ZookeperManager.start()
 
+  implicit val session: Session
   implicit lazy val context: ExecutionContext = global
 
   override def beforeAll() {
     synchronized {
-      if (!ZookeperManager.isCassandraStarted) {
-        try {
-          EmbeddedCassandraServerHelper.mkdirs()
-        } catch {
-          case NonFatal(e) => Manager.logger.error(e.getMessage)
+      blocking {
+        if (!ZookeperManager.isCassandraStarted) {
+          try {
+            EmbeddedCassandraServerHelper.mkdirs()
+          } catch {
+            case NonFatal(e) =>
+          }
+          EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
         }
-        EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
       }
     }
   }

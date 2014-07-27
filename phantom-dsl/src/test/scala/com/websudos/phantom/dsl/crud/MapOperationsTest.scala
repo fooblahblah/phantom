@@ -52,7 +52,7 @@ class MapOperationsTest extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- Recipes.update.where(_.url eqs recipe.url).modify(_.props put item).future()
+      update <- Recipes.update.where(_.url eqs recipe.url).modify(_.props put item).future()(Recipes.session)
       select <- Recipes.select(_.props).where(_.url eqs recipe.url).one
     } yield {
       select

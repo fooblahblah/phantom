@@ -18,8 +18,61 @@
 
 package com.websudos.phantom.zookeeper
 
-import org.slf4j.LoggerFactory
+import scala.collection.JavaConverters._
+import scala.util.DynamicVariable
 
-object ZookeeperManager {
+import org.slf4j.{ Logger, LoggerFactory }
+
+import com.datastax.driver.core.Cluster
+
+trait ZookeeperManager {
+
+  protected[this] val store: ClusterStore
+
+  def cluster: Cluster = store.value
+
+  val logger: Logger
+}
+
+class EmptyClusterStoreException extends RuntimeException("Attempting to retrieve Cassandra cluster reference before initialisation")
+
+
+trait ClusterStore {
+  protected[this] val clusterStore = new DynamicVariable[Cluster](null)
+
+  private[this] var inited = false
+
+  def store(cluster: Cluster): Unit = synchronized {
+    if (!inited) {
+      clusterStore.value_=(cluster)
+      inited = true
+    }
+  }
+
+  def isInited: Boolean = inited
+
+  def value: Cluster = {
+    if (inited) {
+      clusterStore.value
+    } else {
+      throw new EmptyClusterStoreException
+    }
+  }
+}
+
+object DefaultClusterStore extends ClusterStore
+
+class DefaultZookeeperManager(connector: ZookeeperConnector) extends ZookeeperManager {
+
   lazy val logger = LoggerFactory.getLogger("com.websudos.phantom.zookeeper")
+
+  val store = DefaultClusterStore
+
+  if (!store.isInited) {
+    store.store(Cluster.builder()
+      .addContactPointsWithPorts(connector.hostnamePortPairs.asJava)
+      .withoutJMXReporting()
+      .withoutMetrics()
+      .build())
+  }
 }

@@ -22,8 +22,6 @@ import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class IterateeBigReadTest extends BigTest with ScalaFutures {
 
-  val keySpace: String = "BigIterateeTestSpace"
-
   it should "read the records found in the table" in {
     val counter: AtomicLong = new AtomicLong(0)
     val result = PrimitivesJoda.select.fetchEnumerator run Iteratee.forEach {

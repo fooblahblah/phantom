@@ -15,7 +15,6 @@
  */
 package com.websudos.phantom.dsl.ordering
 
-import scala.concurrent.blocking
 import scala.concurrent.duration._
 
 import org.scalatest.concurrent.PatienceConfiguration
@@ -30,10 +29,8 @@ class TimeSeriesTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      TimeSeriesTable.insertSchema()
-    }
+    super.beforeAll()
+    TimeSeriesTable.insertSchema()
   }
 
   it should "allow using naturally fetch the records in descending order for a descending clustering order" in {

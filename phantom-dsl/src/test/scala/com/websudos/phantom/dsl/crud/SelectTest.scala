@@ -27,10 +27,8 @@ class SelectTest extends BaseTest {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      Primitives.insertSchema()
-    }
+    super.beforeAll()
+    Primitives.insertSchema()
   }
 
   "Selecting the whole row" should "work fine" in {
