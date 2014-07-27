@@ -56,15 +56,13 @@ trait ZookeeperManager {
   protected[this] def connectIfNotConnected() = synchronized {
     if (!connectionStatus) {
       logger.info("Connecting to Zookeeper instance")
-      Await.ready(zkClient.connect(), 2.seconds)
+      Await.ready(store.zkClient.connect(), 2.seconds)
       connectionStatus = true
     } else {
       logger.info("Already connected to Zookeeper instance")
     }
   }
   
-  val zkClient: ZkClient
-
 }
 
 class EmptyClusterStoreException extends RuntimeException("Attempting to retrieve Cassandra cluster reference before initialisation")
@@ -75,7 +73,6 @@ trait ClusterStore {
   protected[this] val zkClientStore = new DynamicVariable[ZkClient](null)
 
   var inited = false
-  var clientInited = false
 
   def store(cluster: Cluster): Unit = synchronized {
     if (!inited) {
@@ -85,9 +82,9 @@ trait ClusterStore {
   }
 
   def storeClient(client: ZkClient): Unit = synchronized {
-    if (!clientInited) {
+    if (!inited) {
       zkClientStore.value_=(client)
-      clientInited = true
+      inited = true
     }
   }
 
@@ -117,23 +114,20 @@ class DefaultZookeeperManager(connector: ZookeeperConnector) extends ZookeeperMa
   val store = DefaultClusterStore
 
   if (!store.inited) {
+    store.storeClient(ZooKeeper.newRichClient(connector.connectorString))
+
+    connectIfNotConnected()
+
     store.store(Cluster.builder()
-      .addContactPointsWithPorts(connector.hostnamePortPairs.asJava)
+      .addContactPointsWithPorts(hostnamePortPairs.asJava)
       .withoutJMXReporting()
       .withoutMetrics()
       .build())
   }
 
-  if (!store.clientInited) {
-    store.storeClient(ZooKeeper.newRichClient(connector.connectorString))
-  }
-
   val zkAddress = connector.zkAddress
 
-  val zkClient = store.zkClient
-
-  def hostnamePortPairs: Seq[InetSocketAddress] = Try {
-    connectIfNotConnected()
+  def hostnamePortPairs: Seq[InetSocketAddress] = {
 
     val mapped = store.zkClient.getData("/cassandra", watch = false) map {
       res => Try {
@@ -148,5 +142,5 @@ class DefaultZookeeperManager(connector: ZookeeperConnector) extends ZookeeperMa
     logger.info("Extracting Cassandra ports from ZooKeeper")
     logger.info(s"Parsing from ${res.mkString(" ")}")
     res
-  } getOrElse Seq.empty[InetSocketAddress]
+  }
 }
