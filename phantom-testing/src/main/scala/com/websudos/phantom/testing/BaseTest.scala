@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, blocking}
 
 import org.cassandraunit.utils.EmbeddedCassandraServerHelper
 import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
-import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers}
+import org.scalatest._
 
 import com.datastax.driver.core.Session
 import com.twitter.util.{ NonFatal, Try }
@@ -87,6 +87,8 @@ trait CassandraSetup extends TestZookeeperConnector {
 
 
 trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with CassandraSetup with BeforeAndAfterAll {
+
+  self : BeforeAndAfterAll with Suite =>
 
   implicit val session: Session
   implicit lazy val context: ExecutionContext = global

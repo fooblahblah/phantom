@@ -15,10 +15,8 @@
  */
 package com.websudos.phantom.iteratee
 
-import com.twitter.util.Duration
 import com.websudos.phantom.testing.BaseTest
 
 
 trait BigTest extends BaseTest {
-  cluster.getConfiguration.getSocketOptions.setReadTimeoutMillis(Duration.fromSeconds(3).inSeconds)
 }
