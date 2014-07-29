@@ -52,40 +52,53 @@ private[testing] object ZookeperManager {
   def isCassandraStarted: Boolean = {
     Try { new ServerSocket(9142) }.toOption.isEmpty
   }
+
+  def isLocalCassandraRunning: Boolean = {
+    Try { new ServerSocket(9042) }.toOption.isEmpty
+  }
+
 }
 
 
-trait TestZookeeperManager extends DefaultZookeeperConnector {
+trait TestZookeeperConnector extends DefaultZookeeperConnector {
   val keySpace = "phantom"
 }
 
-
-trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with TestZookeeperManager {
-  self: BeforeAndAfterAll =>
-
+trait CassandraSetup extends TestZookeeperConnector {
   ZookeperManager.start()
 
-  implicit val session: Session
-  implicit lazy val context: ExecutionContext = global
-
-  override def beforeAll() {
+  def setupCassandra(): Unit = {
     synchronized {
       blocking {
         if (!ZookeperManager.isCassandraStarted) {
           try {
             EmbeddedCassandraServerHelper.mkdirs()
           } catch {
-            case NonFatal(e) =>
+            case NonFatal(e) => println(e.getMessage)
           }
           EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
         }
       }
     }
   }
+
 }
 
-trait BaseTest extends FlatSpec with BeforeAndAfterAll with CassandraTest
 
-trait FeatureBaseTest extends FeatureSpec with BeforeAndAfterAll with CassandraTest
+
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with CassandraSetup with BeforeAndAfterAll {
+
+  implicit val session: Session
+  implicit lazy val context: ExecutionContext = global
+
+  override def beforeAll() {
+    super.beforeAll()
+    setupCassandra()
+  }
+}
+
+trait BaseTest extends FlatSpec with CassandraTest
+
+trait FeatureBaseTest extends FeatureSpec with CassandraTest
 
 
