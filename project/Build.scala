@@ -42,7 +42,7 @@ object phantom extends Build {
         </licenses>
         <scm>
           <url>git@github.com:websudosuk/phantom.git</url>
-          <connection>scm:git:git@github.com:newzly/phantom.git</connection>
+          <connection>scm:git:git@github.com:websudosuk/phantom.git</connection>
         </scm>
         <developers>
           <developer>
@@ -74,7 +74,7 @@ object phantom extends Build {
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
     organization := "com.websudos",
-    version := "0.9.9",
+    version := "0.9.11",
     scalaVersion := "2.10.4",
     resolvers ++= Seq(
       "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",
@@ -85,10 +85,8 @@ object phantom extends Build {
       "Sonatype staging"                 at "http://oss.sonatype.org/content/repositories/staging",
       "Java.net Maven2 Repository"       at "http://download.java.net/maven/2/",
       "Twitter Repository"               at "http://maven.twttr.com",
-      "newzly Libs snapshots"            at "http://newzly-artifactory.elasticbeanstalk.com/libs-release-local",
-      "newzly Libs"                      at "http://newzly-artifactory.elasticbeanstalk.com/libs-snapshot-local",
-      "newzly External snapshots"        at "http://newzly-artifactory.elasticbeanstalk.com/ext-release-local",
-      "newzly External"                  at "http://newzly-artifactory.elasticbeanstalk.com/ext-snapshot-local"
+      "Websudos releases"                at "http://maven.websudos.co.uk/ext-release-local",
+      "Websudos snapshots"               at "http://maven.websudos.co.uk/ext-snapshot-local"
     ),
     scalacOptions ++= Seq(
       "-language:postfixOps",
