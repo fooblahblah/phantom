@@ -21,8 +21,6 @@ package com.websudos.phantom.zookeeper
 
 import java.net.InetSocketAddress
 
-import scala.concurrent.blocking
-
 import com.datastax.driver.core.Session
 import com.twitter.util.Try
 
@@ -45,12 +43,7 @@ trait ZookeeperConnector {
     s"${zkAddress.getHostName}:${zkAddress.getPort}"
   } getOrElse s"${defaultAddress.getHostName}:${defaultAddress.getPort}"
 
-  implicit lazy val session: Session = blocking {
-    val s = zkManager.cluster.connect()
-    s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
-    s.execute(s"use $keySpace;")
-    s
-  }
+  implicit lazy val session: Session = zkManager.session
 
 }
 
