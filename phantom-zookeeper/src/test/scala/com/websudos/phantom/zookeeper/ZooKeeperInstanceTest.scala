@@ -18,13 +18,19 @@
 
 package com.websudos.phantom.zookeeper
 
-import java.net.InetSocketAddress
-
-import org.scalatest.{ BeforeAndAfterAll, Matchers, FlatSpec }
-import com.newzly.util.testing.AsyncAssertionsHelper._
+import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
 
 class ZooKeeperInstanceTest extends FlatSpec with Matchers with BeforeAndAfterAll {
 
+  it should "use the same Zookeeper connector and client instance for all tables" in {
+    val instance = new ZookeeperInstance()
+    instance.start()
+
+    TestTable.zkManager.store.zkClient eq TestTable2.zkManager.store.zkClient shouldEqual true
+  }
+
+
+  /*
   it should "correctly set the status flag to true after starting the ZooKeeper Instance" in {
     val instance = new ZookeeperInstance()
     instance.start()
@@ -63,4 +69,5 @@ class ZooKeeperInstanceTest extends FlatSpec with Matchers with BeforeAndAfterAl
     }
     instance.stop()
   }
+  */
 }

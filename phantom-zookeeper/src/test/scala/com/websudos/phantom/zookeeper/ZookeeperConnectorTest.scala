@@ -22,10 +22,17 @@ import java.net.InetSocketAddress
 import org.scalatest.{ BeforeAndAfterAll, FlatSpec, Matchers }
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.twitter.conversions.time._
+import com.twitter.util.Await
 
 object TestTable extends DefaultZookeeperConnector {
   val keySpace = "phantom"
 }
+
+object TestTable2 extends DefaultZookeeperConnector {
+  val keySpace = "phantom"
+}
+
 
 class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterAll {
   val instance = new ZookeeperInstance()
@@ -86,6 +93,9 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "correctly parse multiple pairs of hostname:port from Zookeeper" in {
+
+    Await.ready(TestTable.zkManager.store.zkClient.connect(), 2.seconds)
+
     val chain = for {
       set <- TestTable.zkManager.store.zkClient.setData(TestTable.zkPath, "localhost:9142, localhost:9900, 127.131.211.23:3402".getBytes, -1)
       get <- TestTable.zkManager.store.zkClient.getData("/cassandra", watch = false)

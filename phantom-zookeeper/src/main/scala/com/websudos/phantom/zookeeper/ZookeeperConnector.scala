@@ -41,7 +41,9 @@ trait ZookeeperConnector {
 
   val keySpace: String
 
-  private[zookeeper] def connectorString = s"${zkAddress.getHostName}:${zkAddress.getPort}"
+  private[zookeeper] def connectorString = Try {
+    s"${zkAddress.getHostName}:${zkAddress.getPort}"
+  } getOrElse s"${defaultAddress.getHostName}:${defaultAddress.getPort}"
 
   implicit lazy val session: Session = blocking {
     val s = zkManager.cluster.connect()
@@ -54,7 +56,9 @@ trait ZookeeperConnector {
 
 trait DefaultZookeeperConnector extends ZookeeperConnector {
 
-  val zkManager = new DefaultZookeeperManager(this)
+  val zkManager = DefaultZookeeperManagers.manager
+
+  zkManager.initIfNotInited(this)
 
   val zkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
     val inetPair: String = System.getProperty(envString)

@@ -21,7 +21,6 @@ package com.websudos.phantom.zookeeper
 import java.net.InetSocketAddress
 
 import scala.collection.JavaConverters._
-import scala.util.DynamicVariable
 
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -29,7 +28,7 @@ import com.datastax.driver.core.Cluster
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.finagle.exp.zookeeper.client.ZkClient
-import com.twitter.util.{Await, Try}
+import com.twitter.util.{Await, Timer, Try}
 
 trait ZookeeperManager {
 
@@ -38,10 +37,6 @@ trait ZookeeperManager {
   def cluster: Cluster = store.cluster
 
   val logger: Logger
-
-  def zkAddress: InetSocketAddress
-
-  private[zookeeper] def connectorString = s"${zkAddress.getHostName}:${zkAddress.getPort}"
 
   /**
    * Boolean that keeps track of the connection status of the ZooKeeper rich client.
@@ -62,35 +57,35 @@ trait ZookeeperManager {
       logger.info("Already connected to Zookeeper instance")
     }
   }
-  
+
 }
 
 class EmptyClusterStoreException extends RuntimeException("Attempting to retrieve Cassandra cluster reference before initialisation")
 
 
 trait ClusterStore {
-  protected[this] val clusterStore = new DynamicVariable[Cluster](null)
-  protected[this] val zkClientStore = new DynamicVariable[ZkClient](null)
+  protected[this] var clusterStore: Cluster = null
+  protected[this] var zkClientStore: ZkClient = null
 
   var inited = false
 
   def store(cluster: Cluster): Unit = synchronized {
     if (!inited) {
-      clusterStore.value_=(cluster)
+      clusterStore = cluster
       inited = true
     }
   }
 
   def storeClient(client: ZkClient): Unit = synchronized {
     if (!inited) {
-      zkClientStore.value_=(client)
+      zkClientStore = client
       inited = true
     }
   }
 
   def cluster: Cluster = {
     if (inited) {
-      clusterStore.value
+      clusterStore
     } else {
       throw new EmptyClusterStoreException
     }
@@ -98,7 +93,7 @@ trait ClusterStore {
 
   def zkClient: ZkClient = {
     if (inited) {
-      zkClientStore.value
+      zkClientStore
     } else {
       throw new EmptyClusterStoreException
     }
@@ -107,40 +102,50 @@ trait ClusterStore {
 
 object DefaultClusterStore extends ClusterStore
 
-class DefaultZookeeperManager(connector: ZookeeperConnector) extends ZookeeperManager {
+class DefaultZookeeperManager extends ZookeeperManager {
 
   lazy val logger = LoggerFactory.getLogger("com.websudos.phantom.zookeeper")
 
   val store = DefaultClusterStore
 
-  if (!store.inited) {
-    store.storeClient(ZooKeeper.newRichClient(connector.connectorString))
 
-    connectIfNotConnected()
+  def initIfNotInited(connector: ZookeeperConnector) = synchronized {
+    if (!store.inited) {
+      store.storeClient(ZooKeeper.newRichClient(connector.connectorString))
+      connectIfNotConnected()
 
-    store.store(Cluster.builder()
-      .addContactPointsWithPorts(hostnamePortPairs.asJava)
-      .withoutJMXReporting()
-      .withoutMetrics()
-      .build())
+      Timer.Nil.doLater(2.seconds) {
+        store.store(Cluster.builder()
+          .addContactPointsWithPorts(hostnamePortPairs.asJava)
+          .withoutJMXReporting()
+          .withoutMetrics()
+          .build())
+      }
+    }
   }
-
-  val zkAddress = connector.zkAddress
 
   def hostnamePortPairs: Seq[InetSocketAddress] = {
+    if (store.inited) {
+      val mapped = store.zkClient.getData("/cassandra", watch = false) map {
+        res => Try {
+          val data = new String(res.data)
+          data.split("\\s*,\\s*").map(_.split(":")).map {
+            case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
+          }.toSeq
+        } getOrElse Seq.empty[InetSocketAddress]
+      }
 
-    val mapped = store.zkClient.getData("/cassandra", watch = false) map {
-      res => Try {
-        val data = new String(res.data)
-        data.split("\\s*,\\s*").map(_.split(":")).map {
-          case Array(hostname, port) => new InetSocketAddress(hostname, port.toInt)
-        }.toSeq
-      } getOrElse Seq.empty[InetSocketAddress]
+      val res = Await.result(mapped, 3.seconds)
+      logger.info("Extracting Cassandra ports from ZooKeeper")
+      logger.info(s"Parsing from ${res.mkString(" ")}")
+      res
+    } else {
+      throw new EmptyClusterStoreException()
     }
 
-    val res = Await.result(mapped, 3.seconds)
-    logger.info("Extracting Cassandra ports from ZooKeeper")
-    logger.info(s"Parsing from ${res.mkString(" ")}")
-    res
   }
+}
+
+object DefaultZookeeperManagers {
+  val manager = new DefaultZookeeperManager
 }
