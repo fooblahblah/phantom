@@ -48,8 +48,30 @@ trait ZookeeperManager {
 
 class EmptyClusterStoreException extends RuntimeException("Attempting to retrieve Cassandra cluster reference before initialisation")
 
-
+/**
+ * This is a simple implementation that will allow for singleton synchronisation of Cassandra clusters and sessions.
+ * Connector traits may be mixed in to any number of Cassandra tables, but at runtime, the cluster, session or ZooKeeper client must be the same.
+ *
+ * The ClusterStore serves as a sync point for the ZooKeeperClient, Cassandra Cluster and Cassandra session triplet.
+ * All it needs as external information is the keySpace used by the Cassandra connection.
+ *
+ * It will perform the following sequence of actions in order:
+ * - It will read a known environment variable, named TEST_ZOOKEEPER_CONNECTOR to find the IP:PORT combo for the master ZooKeeper coordinator node.
+ * - If the combo is not found, it will try to use the default ZooKeeper master address, namely localhost:2181.
+ * - It will then try to connect to the ZooKeeper master and fetch the data from the "/cassandra" path.
+ * - On that path, it expects to find a sequence of IP:PORT combos in the following format: "ip1:host1, ip2:host2, ip3:host3, ...".
+ * - It will fetch the ports, parse them into their equivalent java.net.InetSocketAddress instance.
+ * - With that sequence of InetSocketAddress connections, it will spawn a Cassandra Load Balancer cluster configuration.
+ * - This will work with any number of Cassandra nodes present in ZooKeeper, the connection manager will load balance over all Cassandra IPs found in ZooKeeper.
+ * - After the cluster is spawned, the Store will attempt to create the keySpace if necessary, using a Cassandra Compare-and-Set query.
+ * - It will then feed the keySpace into the Cassandra session to obtain a final, directly usable values where queries can execute.
+ *
+ * The initialisation process is entirely synchronised, using the JVM handle before to ensure only the first thread trying to read a Cassandra Session will
+ * cause the initialisation process to start. Any thread thereafter will simply read the initialised ready-to-use version. Any attempt to read values directly
+ * before they are initialised will throw an EmptyClusterStoreException.
+ */
 trait ClusterStore {
+
   protected[this] var clusterStore: Cluster = null
   protected[this] var zkClientStore: ZkClient = null
   protected[this] var _session: Session = null
@@ -80,7 +102,7 @@ trait ClusterStore {
       val conn = s"${address.getHostName}:${address.getPort}"
       zkClientStore = ZooKeeper.newRichClient(conn)
 
-      Console.println(s"Connecting to ZooKeeper server instance on ${conn}")
+      Console.println(s"Connecting to ZooKeeper server instance on $conn")
 
       val res = Await.result(zkClientStore.connect(), 2.seconds)
 
@@ -106,6 +128,7 @@ trait ClusterStore {
     }
   }
 
+  @throws[EmptyClusterStoreException]
   def cluster: Cluster = {
     if (inited) {
       clusterStore
@@ -114,8 +137,16 @@ trait ClusterStore {
     }
   }
 
-  def session: Session = _session
+  @throws[EmptyClusterStoreException]
+  def session: Session = {
+    if (inited) {
+      _session
+    } else {
+      throw new EmptyClusterStoreException
+    }
+  }
 
+  @throws[EmptyClusterStoreException]
   def zkClient: ZkClient = {
     if (inited) {
       zkClientStore
@@ -129,6 +160,18 @@ object DefaultClusterStore extends ClusterStore
 
 class DefaultZookeeperManager extends ZookeeperManager {
 
+  /**
+   * This is the default way a ZooKeeper connector will obtain the HOST:IP port of the ZooKeeper coordinator(master) node.
+   * The phantom testing utilities are capable of auto-generating a ZooKeeper instance if none is found running.
+   *
+   * A test instance is ephemeral with zero persistence, it will get created, populated and deleted once per test run.
+   * Upon creation, the test instance will propagate the IP:PORT combo it found available to an environment variable.
+   * By convention that variable is TEST_ZOOKEEPER_CONNECTOR.
+   *
+   * This method will try to read that variable and parse an {@link java.net.InetSocketAddress} from it.
+   * If the environment variable is null or an InetSocketAddress cannot be parsed from it, the ZooKeeper default, localhost:2181 will be used.
+   * @return The InetSocketAddress of the ZooKeeper master node.
+   */
   def defaultZkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
     val inetPair: String = System.getProperty(envString)
     val split = inetPair.split(":")
