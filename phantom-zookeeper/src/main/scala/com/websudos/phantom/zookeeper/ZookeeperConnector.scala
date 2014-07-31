@@ -18,55 +18,20 @@
 
 package com.websudos.phantom.zookeeper
 
-
-import java.net.InetSocketAddress
-
 import com.datastax.driver.core.Session
-import com.twitter.util.Try
 
 trait ZookeeperConnector {
-
-
-  protected[zookeeper] val envString = "TEST_ZOOKEEPER_CONNECTOR"
-
-  protected[this] val defaultAddress = new InetSocketAddress("localhost", 2181)
-
   val zkPath = "/cassandra"
-
-  def zkAddress: InetSocketAddress
 
   val zkManager: ZookeeperManager
 
   val keySpace: String
 
-  private[zookeeper] def connectorString = Try {
-    s"${zkAddress.getHostName}:${zkAddress.getPort}"
-  } getOrElse s"${defaultAddress.getHostName}:${defaultAddress.getPort}"
-
   implicit lazy val session: Session = zkManager.session
-
 }
 
 trait DefaultZookeeperConnector extends ZookeeperConnector {
 
   val zkManager = DefaultZookeeperManagers.manager
-
   zkManager.initIfNotInited(this)
-
-  val zkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
-    val inetPair: String = System.getProperty(envString)
-    val split = inetPair.split(":")
-
-    Try {
-      zkManager.logger.info(s"Using ZooKeeper settings from the $envString environment variable")
-      zkManager.logger.info(s"Connecting to ZooKeeper address: ${split(0)}:${split(1)}")
-      new InetSocketAddress(split(0), split(1).toInt)
-    } getOrElse {
-      zkManager.logger.warn(s"Failed to parse address from $envString environment variable with value: $inetPair")
-      defaultAddress
-    }
-  } else {
-    zkManager.logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as default.")
-    defaultAddress
-  }
 }

@@ -18,36 +18,32 @@
 
 package com.websudos.phantom.zookeeper
 
+import java.net.InetSocketAddress
 import org.scalatest.{BeforeAndAfterAll, FlatSpec, Matchers}
+import com.newzly.util.testing.AsyncAssertionsHelper._
 
 class ZooKeeperInstanceTest extends FlatSpec with Matchers with BeforeAndAfterAll {
+  val instance = new ZookeeperInstance()
 
-  it should "use the same Zookeeper connector and client instance for all tables" in {
-    val instance = new ZookeeperInstance()
+  override def beforeAll(): Unit = {
+    super.beforeAll()
     instance.start()
-
-    TestTable.zkManager.store.zkClient eq TestTable2.zkManager.store.zkClient shouldEqual true
   }
 
-
-  /*
-  it should "correctly set the status flag to true after starting the ZooKeeper Instance" in {
-    val instance = new ZookeeperInstance()
-    instance.start()
-    instance.isStarted shouldEqual true
+  override def afterAll(): Unit = {
+    super.afterAll()
     instance.stop()
+  }
+
+  it should "correctly set the status flag to true after starting the ZooKeeper Instance" in {
+    instance.isStarted shouldEqual true
   }
 
   it should "correctly initialise a ZooKeeper ServerSet after starting a ZooKeeper instance" in {
-    val instance = new ZookeeperInstance()
-    instance.start()
     instance.zookeeperServer.isRunning shouldEqual true
-    instance.stop()
   }
 
   it should "retrieve the correct data from the Cassandra path by default" in {
-    val instance = new ZookeeperInstance()
-    instance.start()
     instance.richClient.getData("/cassandra", watch = false).successful {
       res => {
         res shouldNot equal(null)
@@ -56,18 +52,13 @@ class ZooKeeperInstanceTest extends FlatSpec with Matchers with BeforeAndAfterAl
       }
 
     }
-    instance.stop()
   }
 
   it should "correctly parse the retrieved data into a Sequence of InetSocketAddresses" in {
-    val instance = new ZookeeperInstance()
-    instance.start()
     instance.hostnamePortPairs.successful {
       res => {
         res shouldEqual Seq(new InetSocketAddress("localhost", 9142))
       }
     }
-    instance.stop()
   }
-  */
 }

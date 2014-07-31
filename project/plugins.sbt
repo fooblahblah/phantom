@@ -5,9 +5,12 @@ resolvers ++= Seq(
     "sonatype-releases" at "https://oss.sonatype.org/content/repositories/releases/"
 )
 
-addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.4")
+resolvers += Resolver.url(
+  "sbt-plugin-releases",
+  new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/")
+)(Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.6.2")
+addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.7.4")
 
 addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.11.2")
 

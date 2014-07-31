@@ -15,8 +15,7 @@ object phantom extends Build {
   val thriftVersion = "0.9.1"
   val scalatraVersion = "2.2.2"
 
-  val publishUrl = "http://newzly-artifactory.elasticbeanstalk.com"
-
+  val publishUrl = "http://maven.websudos.co.uk"
 
   val mavenPublishSettings : Seq[Def.Setting[_]] = Seq(
     credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
@@ -74,7 +73,7 @@ object phantom extends Build {
 
   val sharedSettings: Seq[Def.Setting[_]] = Seq(
     organization := "com.websudos",
-    version := "0.9.11",
+    version := "0.9.12",
     scalaVersion := "2.10.4",
     resolvers ++= Seq(
       "Typesafe repository snapshots" at "http://repo.typesafe.com/typesafe/snapshots/",

@@ -65,19 +65,16 @@ trait TestZookeeperConnector extends DefaultZookeeperConnector {
 }
 
 trait CassandraSetup extends TestZookeeperConnector {
-  ZookeperManager.start()
-
   def setupCassandra(): Unit = {
     synchronized {
-      blocking {
-        if (!ZookeperManager.isCassandraStarted) {
-          try {
-            EmbeddedCassandraServerHelper.mkdirs()
-          } catch {
-            case NonFatal(e) => println(e.getMessage)
-          }
-          EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
+      ZookeperManager.start()
+      if (!ZookeperManager.isCassandraStarted) {
+        try {
+          EmbeddedCassandraServerHelper.mkdirs()
+        } catch {
+          case NonFatal(e) => println(e.getMessage)
         }
+        EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
       }
     }
   }

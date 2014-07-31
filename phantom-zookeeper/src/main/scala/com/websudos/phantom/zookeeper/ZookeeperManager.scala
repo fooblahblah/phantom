@@ -20,8 +20,8 @@ package com.websudos.phantom.zookeeper
 
 import java.net.InetSocketAddress
 
+import scala.concurrent.blocking
 import scala.collection.JavaConverters._
-import scala.concurrent._
 
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -29,7 +29,7 @@ import com.datastax.driver.core.{Session, Cluster}
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.finagle.exp.zookeeper.client.ZkClient
-import com.twitter.util.{Await, Timer, Try}
+import com.twitter.util.{Await, Future, Timer, Try}
 
 trait ZookeeperManager {
 
@@ -40,6 +40,10 @@ trait ZookeeperManager {
   def session: Session = store.session
 
   val logger: Logger
+
+  protected[zookeeper] val envString = "TEST_ZOOKEEPER_CONNECTOR"
+
+  protected[this] val defaultAddress = new InetSocketAddress("localhost", 2181)
 }
 
 class EmptyClusterStoreException extends RuntimeException("Attempting to retrieve Cassandra cluster reference before initialisation")
@@ -54,9 +58,9 @@ trait ClusterStore {
 
   lazy val logger = LoggerFactory.getLogger("com.websudos.phantom.zookeeper")
 
-  def hostnamePortPairs: Seq[InetSocketAddress] = {
+  def hostnamePortPairs: Future[Seq[InetSocketAddress]] = {
     if (inited) {
-      val mapped = zkClientStore.getData("/cassandra", watch = false) map {
+      zkClientStore.getData("/cassandra", watch = false) map {
         res => Try {
           val data = new String(res.data)
           data.split("\\s*,\\s*").map(_.split(":")).map {
@@ -64,24 +68,27 @@ trait ClusterStore {
           }.toSeq
         } getOrElse Seq.empty[InetSocketAddress]
       }
-
-      val res = Await.result(mapped, 3.seconds)
-      logger.info("Extracting Cassandra ports from ZooKeeper")
-      logger.info(s"Parsing from ${res.mkString(" ")}")
-      res
     } else {
-      throw new EmptyClusterStoreException()
+      Future.exception(new EmptyClusterStoreException())
     }
   }
 
-  def initStore(connector: ZookeeperConnector): Unit = synchronized {
+  def initStore(keySpace: String, address: InetSocketAddress ): Unit = synchronized {
+    assert(address != null)
+
     if (!inited) {
-      zkClientStore = ZooKeeper.newRichClient(connector.connectorString)
-      Await.ready(zkClientStore.connect(), 2.seconds)
+      val conn = s"${address.getHostName}:${address.getPort}"
+      zkClientStore = ZooKeeper.newRichClient(conn)
+
+      Console.println(s"Connecting to ZooKeeper server instance on ${conn}")
+
+      val res = Await.result(zkClientStore.connect(), 2.seconds)
+
+      val ports = Await.result(hostnamePortPairs, 2.seconds)
 
       Timer.Nil.doLater(1.seconds) {
         clusterStore = Cluster.builder()
-          .addContactPointsWithPorts(hostnamePortPairs.asJava)
+          .addContactPointsWithPorts(ports.asJava)
           .withoutJMXReporting()
           .withoutMetrics()
           .build()
@@ -89,8 +96,8 @@ trait ClusterStore {
 
         _session = blocking {
           val s = cluster.connect()
-          s.execute(s"CREATE KEYSPACE IF NOT EXISTS ${connector.keySpace} WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
-          s.execute(s"use ${connector.keySpace};")
+          s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
+          s.execute(s"use $keySpace;")
           s
         }
 
@@ -122,6 +129,23 @@ object DefaultClusterStore extends ClusterStore
 
 class DefaultZookeeperManager extends ZookeeperManager {
 
+  def defaultZkAddress: InetSocketAddress = if (System.getProperty(envString) != null) {
+    val inetPair: String = System.getProperty(envString)
+    val split = inetPair.split(":")
+
+    Try {
+      logger.info(s"Using ZooKeeper settings from the $envString environment variable")
+      logger.info(s"Connecting to ZooKeeper address: ${split(0)}:${split(1)}")
+      new InetSocketAddress(split(0), split(1).toInt)
+    } getOrElse {
+      logger.warn(s"Failed to parse address from $envString environment variable with value: $inetPair")
+      defaultAddress
+    }
+  } else {
+    logger.info(s"No custom settings for Zookeeper found in $envString. Using localhost:2181 as default.")
+    defaultAddress
+  }
+
   lazy val logger = LoggerFactory.getLogger("com.websudos.phantom.zookeeper")
 
   val store = DefaultClusterStore
@@ -131,7 +155,7 @@ class DefaultZookeeperManager extends ZookeeperManager {
    * It will connector to ZooKeeper, fetch the Cassandra sequence of HOST:IP pairs, and create a cluster + session for the mix.
    * @param connector The ZooKeeper connector instance, where the ZooKeeper address and Cassandra keySpace is specified.
    */
-  def initIfNotInited(connector: ZookeeperConnector) = store.initStore(connector)
+  def initIfNotInited(connector: ZookeeperConnector, address: InetSocketAddress = defaultZkAddress) = store.initStore(connector.keySpace, address)
 }
 
 object DefaultZookeeperManagers {
