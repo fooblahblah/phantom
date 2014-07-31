@@ -61,7 +61,6 @@ object SimpleCassandraManager extends CassandraManager {
 
 trait SimpleCassandraConnector extends CassandraSetup {
   val keySpace: String
-  SimpleCassandraManager.initIfNotInited(keySpace)
 }
 
 trait SimpleCassandraTest extends ScalaFutures with SimpleCassandraConnector with Matchers with Assertions with AsyncAssertions with BeforeAndAfterAll {
@@ -70,5 +69,6 @@ trait SimpleCassandraTest extends ScalaFutures with SimpleCassandraConnector wit
   override def beforeAll() {
     super.beforeAll()
     setupCassandra()
+    SimpleCassandraManager.initIfNotInited(keySpace)
   }
 }
