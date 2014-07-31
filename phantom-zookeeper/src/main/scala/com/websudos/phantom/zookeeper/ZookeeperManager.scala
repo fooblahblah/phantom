@@ -20,16 +20,16 @@ package com.websudos.phantom.zookeeper
 
 import java.net.InetSocketAddress
 
-import scala.concurrent.blocking
 import scala.collection.JavaConverters._
+import scala.concurrent.blocking
 
 import org.slf4j.{Logger, LoggerFactory}
 
-import com.datastax.driver.core.{Session, Cluster}
+import com.datastax.driver.core.{Cluster, Session}
 import com.twitter.conversions.time._
 import com.twitter.finagle.exp.zookeeper.ZooKeeper
 import com.twitter.finagle.exp.zookeeper.client.ZkClient
-import com.twitter.util.{Await, Future, Timer, Try}
+import com.twitter.util.{Await, Future, Try}
 
 trait ZookeeperManager {
 
@@ -76,7 +76,7 @@ trait ClusterStore {
   protected[this] var zkClientStore: ZkClient = null
   protected[this] var _session: Session = null
 
-  var inited = false
+  private[this] var inited = false
 
   lazy val logger = LoggerFactory.getLogger("com.websudos.phantom.zookeeper")
 
@@ -95,10 +95,18 @@ trait ClusterStore {
     }
   }
 
+  def isInited = synchronized {
+    inited
+  }
+
+  def setInited(value: Boolean) = synchronized {
+    inited = value
+  }
+
   def initStore(keySpace: String, address: InetSocketAddress ): Unit = synchronized {
     assert(address != null)
 
-    if (!inited) {
+    if (!isInited) {
       val conn = s"${address.getHostName}:${address.getPort}"
       zkClientStore = ZooKeeper.newRichClient(conn)
 
@@ -108,29 +116,26 @@ trait ClusterStore {
 
       val ports = Await.result(hostnamePortPairs, 2.seconds)
 
-      Timer.Nil.doLater(1.seconds) {
-        clusterStore = Cluster.builder()
-          .addContactPointsWithPorts(ports.asJava)
-          .withoutJMXReporting()
-          .withoutMetrics()
-          .build()
+      clusterStore = Cluster.builder()
+        .addContactPointsWithPorts(ports.asJava)
+        .withoutJMXReporting()
+        .withoutMetrics()
+        .build()
 
 
-        _session = blocking {
-          val s = cluster.connect()
-          s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
-          s.execute(s"use $keySpace;")
-          s
-        }
-
-        inited = true
+      _session = blocking {
+        val s = cluster.connect()
+        s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
+        s.execute(s"use $keySpace;")
+        s
       }
+      setInited(value = true)
     }
   }
 
   @throws[EmptyClusterStoreException]
   def cluster: Cluster = {
-    if (inited) {
+    if (isInited) {
       clusterStore
     } else {
       throw new EmptyClusterStoreException
@@ -139,7 +144,7 @@ trait ClusterStore {
 
   @throws[EmptyClusterStoreException]
   def session: Session = {
-    if (inited) {
+    if (isInited) {
       _session
     } else {
       throw new EmptyClusterStoreException
@@ -148,7 +153,7 @@ trait ClusterStore {
 
   @throws[EmptyClusterStoreException]
   def zkClient: ZkClient = {
-    if (inited) {
+    if (isInited) {
       zkClientStore
     } else {
       throw new EmptyClusterStoreException
