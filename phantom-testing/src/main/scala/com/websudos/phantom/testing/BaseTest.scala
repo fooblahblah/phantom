@@ -59,13 +59,7 @@ private[testing] object ZookeperManager {
 
 }
 
-
-trait TestZookeeperConnector extends DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
-
-trait CassandraSetup extends TestZookeeperConnector {
-  ZookeperManager.start()
+trait CassandraSetup {
 
   def setupCassandra(): Unit = {
     synchronized {
@@ -84,9 +78,13 @@ trait CassandraSetup extends TestZookeeperConnector {
 
 }
 
+trait TestZookeeperConnector extends DefaultZookeeperConnector with CassandraSetup {
+  val keySpace = "phantom"
+  ZookeperManager.start()
 
+}
 
-trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with CassandraSetup with BeforeAndAfterAll {
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with TestZookeeperConnector with BeforeAndAfterAll {
 
   self : BeforeAndAfterAll with Suite =>
 
