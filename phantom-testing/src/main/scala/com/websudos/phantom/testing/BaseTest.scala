@@ -59,31 +59,32 @@ private[testing] object ZookeperManager {
 
 }
 
+trait CassandraSetup {
 
-trait TestZookeeperConnector extends DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
-
-trait CassandraSetup extends TestZookeeperConnector {
   def setupCassandra(): Unit = {
     synchronized {
-      ZookeperManager.start()
-      if (!ZookeperManager.isCassandraStarted) {
-        try {
-          EmbeddedCassandraServerHelper.mkdirs()
-        } catch {
-          case NonFatal(e) => println(e.getMessage)
+      blocking {
+        if (!ZookeperManager.isCassandraStarted) {
+          try {
+            EmbeddedCassandraServerHelper.mkdirs()
+          } catch {
+            case NonFatal(e) => println(e.getMessage)
+          }
+          EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
         }
-        EmbeddedCassandraServerHelper.startEmbeddedCassandra("cassandra.yaml")
       }
     }
   }
 
 }
 
+trait TestZookeeperConnector extends DefaultZookeeperConnector with CassandraSetup {
+  val keySpace = "phantom"
+  ZookeperManager.start()
 
+}
 
-trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with CassandraSetup with BeforeAndAfterAll {
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with TestZookeeperConnector with BeforeAndAfterAll {
 
   self : BeforeAndAfterAll with Suite =>
 
