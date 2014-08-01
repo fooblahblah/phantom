@@ -28,7 +28,7 @@ import com.datastax.driver.core.{Cluster, Session}
 
 trait CassandraManager {
   val cluster: Cluster
-  val session: Session
+  implicit def session: Session
 }
 
 

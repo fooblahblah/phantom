@@ -95,7 +95,7 @@ trait ClusterStore {
     }
   }
 
-  def isInited = synchronized {
+  def isInited: Boolean = synchronized {
     inited
   }
 
