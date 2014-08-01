@@ -1,9 +1,10 @@
 package com.websudos.phantom.tables
 
 import java.util.UUID
+
 import com.datastax.driver.core.Row
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import com.websudos.phantom.PhantomCassandraConnector
 
 
 case class StubRecord(name: String, id: UUID)
@@ -17,9 +18,7 @@ sealed class TableWithSingleKey extends CassandraTable[TableWithSingleKey, StubR
   }
 }
 
-object TableWithSingleKey extends TableWithSingleKey with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object TableWithSingleKey extends TableWithSingleKey with PhantomCassandraConnector
 
 class TableWithCompoundKey extends CassandraTable[TableWithCompoundKey, StubRecord] {
 
@@ -32,10 +31,7 @@ class TableWithCompoundKey extends CassandraTable[TableWithCompoundKey, StubReco
   }
 }
 
-object TableWithCompoundKey extends TableWithCompoundKey with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
-
+object TableWithCompoundKey extends TableWithCompoundKey with PhantomCassandraConnector
 
 
 sealed class TableWithCompositeKey extends CassandraTable[TableWithCompositeKey, StubRecord] {
@@ -50,9 +46,7 @@ sealed class TableWithCompositeKey extends CassandraTable[TableWithCompositeKey,
   }
 }
 
-object TableWithCompositeKey extends TableWithCompositeKey with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object TableWithCompositeKey extends TableWithCompositeKey with PhantomCassandraConnector
 
 sealed class TableWithNoKey extends CassandraTable[TableWithNoKey, StubRecord] {
 
@@ -64,6 +58,4 @@ sealed class TableWithNoKey extends CassandraTable[TableWithNoKey, StubRecord] {
   }
 }
 
-object TableWithNoKey extends TableWithNoKey with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object TableWithNoKey extends TableWithNoKey with PhantomCassandraConnector

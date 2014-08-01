@@ -20,6 +20,14 @@ package com.websudos.phantom.zookeeper
 
 import com.datastax.driver.core.Session
 
+
+trait CassandraConnector {
+  val keySpace: String
+
+  implicit val session: Session
+}
+
+
 /**
  * The base implementation of a ZooKeeper connector.
  * By default it needs a ZooKeeper manager to handle spawning a ZooKeeper client and fetching ports from Cassandra.
@@ -27,11 +35,9 @@ import com.datastax.driver.core.Session
  *
  * The keySpace must also be specified, as the Cassandra connection can only execute queries on a defined keySpace.
  */
-trait ZookeeperConnector {
+trait ZookeeperConnector extends CassandraConnector {
 
   val zkManager: ZookeeperManager
-
-  val keySpace: String
 
   implicit lazy val session: Session = zkManager.session
 }
@@ -42,6 +48,6 @@ trait ZookeeperConnector {
  */
 trait DefaultZookeeperConnector extends ZookeeperConnector {
 
-  val zkManager = DefaultZookeeperManagers.manager
+  val zkManager = DefaultZookeeperManagers.defaultManager
   zkManager.initIfNotInited(this)
 }

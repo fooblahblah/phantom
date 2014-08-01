@@ -16,13 +16,13 @@
 package com.websudos.phantom.tables
 
 import java.net.InetAddress
-import java.util.{ Date, UUID }
+import java.util.{Date, UUID}
+
 import com.datastax.driver.core.Row
-import com.websudos.phantom.CassandraTable
-import com.websudos.phantom.helper.{ ModelSampler, TestSampler}
-import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.helper.{ModelSampler, TestSampler}
+import com.websudos.phantom.{CassandraTable, PhantomCassandraConnector}
 
 case class OptionalPrimitive(
   pkey: String,
@@ -96,8 +96,7 @@ sealed class OptionalPrimitives extends CassandraTable[OptionalPrimitives, Optio
   object bi extends OptionalBigIntColumn(this)
 }
 
-object OptionalPrimitives extends OptionalPrimitives with TestSampler[OptionalPrimitives, OptionalPrimitive] with DefaultZookeeperConnector {
-  val keySpace = "phantom"
+object OptionalPrimitives extends OptionalPrimitives with TestSampler[OptionalPrimitives, OptionalPrimitive] with PhantomCassandraConnector {
 
   override val tableName = "OptionalPrimitives"
 }

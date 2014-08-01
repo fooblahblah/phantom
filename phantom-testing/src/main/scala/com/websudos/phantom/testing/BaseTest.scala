@@ -32,18 +32,7 @@ import com.twitter.util.{ NonFatal, Try }
 import com.websudos.phantom.zookeeper.{ DefaultZookeeperConnector, ZookeeperInstance }
 
 
-private[testing] object ZookeperManager {
-  lazy val zkInstance = new ZookeeperInstance()
-
-  private[this] var isStarted = false
-
-  def start(): Unit = {
-    if (!isStarted) {
-      zkInstance.start()
-      isStarted = true
-    }
-  }
-
+private[testing] object CassandraStateManager {
   /**
    * This does a dummy check to see if Cassandra is started.
    * It checks for default ports for embedded Cassandra and local Cassandra.
@@ -56,15 +45,30 @@ private[testing] object ZookeperManager {
   def isLocalCassandraRunning: Boolean = {
     Try { new ServerSocket(9042) }.toOption.isEmpty
   }
-
 }
+
+
+private[testing] object ZookeperManager {
+  lazy val zkInstance = new ZookeeperInstance()
+
+  private[this] var isStarted = false
+
+  def start(): Unit = {
+    if (!isStarted) {
+      zkInstance.start()
+      isStarted = true
+    }
+  }
+}
+
+private[testing] object Lock
 
 trait CassandraSetup {
 
   def setupCassandra(): Unit = {
-    synchronized {
+    Lock.synchronized {
       blocking {
-        if (!ZookeperManager.isCassandraStarted) {
+        if (!CassandraStateManager.isCassandraStarted) {
           try {
             EmbeddedCassandraServerHelper.mkdirs()
           } catch {
@@ -84,7 +88,7 @@ trait TestZookeeperConnector extends DefaultZookeeperConnector with CassandraSet
 
 }
 
-trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with TestZookeeperConnector with BeforeAndAfterAll {
+trait CassandraTest extends ScalaFutures with Matchers with Assertions with AsyncAssertions with CassandraSetup with BeforeAndAfterAll {
 
   self : BeforeAndAfterAll with Suite =>
 
@@ -97,8 +101,8 @@ trait CassandraTest extends ScalaFutures with Matchers with Assertions with Asyn
   }
 }
 
-trait BaseTest extends FlatSpec with CassandraTest
+trait BaseTest extends FlatSpec with CassandraTest with TestZookeeperConnector
 
-trait FeatureBaseTest extends FeatureSpec with CassandraTest
+trait FeatureBaseTest extends FeatureSpec with CassandraTest with TestZookeeperConnector
 
 

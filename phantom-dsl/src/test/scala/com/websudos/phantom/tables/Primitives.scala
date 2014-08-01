@@ -15,14 +15,14 @@
  */
 package com.websudos.phantom.tables
 
-import java.util.{ Date, UUID }
 import java.net.InetAddress
+import java.util.{Date, UUID}
+
 import com.datastax.driver.core.Row
-import com.websudos.phantom.CassandraTable
-import com.websudos.phantom.helper.{ ModelSampler, TestSampler}
-import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.helper.{ModelSampler, TestSampler}
+import com.websudos.phantom.{CassandraTable, PhantomCassandraConnector}
 
 case class Primitive(
   pkey: String,
@@ -85,8 +85,7 @@ sealed class Primitives extends CassandraTable[Primitives, Primitive] {
   object bi extends BigIntColumn(this)
 }
 
-object Primitives extends Primitives with TestSampler[Primitives, Primitive] with DefaultZookeeperConnector {
+object Primitives extends Primitives with TestSampler[Primitives, Primitive] with PhantomCassandraConnector {
   override val tableName = "Primitives"
 
-  val keySpace = "phantom"
 }

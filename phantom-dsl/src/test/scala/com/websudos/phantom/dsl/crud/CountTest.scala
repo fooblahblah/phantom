@@ -19,11 +19,11 @@ import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.websudos.phantom.CassandraTestSuite
 import com.websudos.phantom.batch.BatchStatement
 import com.websudos.phantom.tables.{JodaRow, PrimitivesJoda}
-import com.websudos.phantom.testing.BaseTest
 
-class CountTest extends BaseTest {
+class CountTest extends CassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

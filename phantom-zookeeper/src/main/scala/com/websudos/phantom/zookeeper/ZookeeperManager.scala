@@ -207,5 +207,5 @@ class DefaultZookeeperManager extends ZookeeperManager {
 }
 
 object DefaultZookeeperManagers {
-  val manager = new DefaultZookeeperManager
+  lazy val defaultManager = new DefaultZookeeperManager
 }

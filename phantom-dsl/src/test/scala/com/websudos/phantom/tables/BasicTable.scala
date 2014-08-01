@@ -18,7 +18,7 @@ package com.websudos.phantom.tables
 import java.util.UUID
 import com.datastax.driver.core.Row
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import com.websudos.phantom.PhantomCassandraConnector
 
 sealed class BasicTable extends CassandraTable[BasicTable, String] {
 
@@ -32,9 +32,7 @@ sealed class BasicTable extends CassandraTable[BasicTable, String] {
   }
 }
 
-object BasicTable extends BasicTable with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object BasicTable extends BasicTable with PhantomCassandraConnector
 
 sealed class ClusteringTable extends CassandraTable[ClusteringTable, String] {
 
@@ -48,9 +46,7 @@ sealed class ClusteringTable extends CassandraTable[ClusteringTable, String] {
   }
 }
 
-object ClusteringTable extends ClusteringTable with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object ClusteringTable extends ClusteringTable with PhantomCassandraConnector
 
 sealed class ComplexClusteringTable extends CassandraTable[ComplexClusteringTable, String] {
 
@@ -64,9 +60,7 @@ sealed class ComplexClusteringTable extends CassandraTable[ComplexClusteringTabl
   }
 }
 
-object ComplexClusteringTable extends ComplexClusteringTable with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object ComplexClusteringTable extends ComplexClusteringTable with PhantomCassandraConnector
 
 sealed class ComplexCompoundKeyTable extends CassandraTable[ComplexCompoundKeyTable, String] {
 
@@ -86,9 +80,7 @@ sealed class ComplexCompoundKeyTable extends CassandraTable[ComplexCompoundKeyTa
   }
 }
 
-object ComplexCompoundKeyTable extends ComplexCompoundKeyTable with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object ComplexCompoundKeyTable extends ComplexCompoundKeyTable with PhantomCassandraConnector
 
 sealed class SimpleCompoundKeyTable extends CassandraTable[SimpleCompoundKeyTable, String] {
 
@@ -102,6 +94,4 @@ sealed class SimpleCompoundKeyTable extends CassandraTable[SimpleCompoundKeyTabl
   }
 }
 
-object SimpleCompoundKeyTable extends SimpleCompoundKeyTable with DefaultZookeeperConnector {
-  val keySpace = "phantom"
-}
+object SimpleCompoundKeyTable extends SimpleCompoundKeyTable with PhantomCassandraConnector

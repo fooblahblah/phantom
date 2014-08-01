@@ -16,11 +16,10 @@
 package com.websudos.phantom.tables
 
 import com.datastax.driver.core.Row
-import com.websudos.phantom.CassandraTable
-import com.websudos.phantom.helper.{ ModelSampler, TestSampler }
-import com.websudos.phantom.Implicits._
 import com.newzly.util.testing.Sampler
-import com.websudos.phantom.zookeeper.DefaultZookeeperConnector
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.helper.{ModelSampler, TestSampler}
+import com.websudos.phantom.{CassandraTable, PhantomCassandraConnector}
 
 case class MyTestRow(
   key: String,
@@ -49,8 +48,7 @@ sealed class MyTest extends CassandraTable[MyTest, MyTestRow] {
 
 }
 
-object MyTest extends MyTest with TestSampler[MyTest, MyTestRow] with DefaultZookeeperConnector {
-  val keySpace = "phantom"
+object MyTest extends MyTest with TestSampler[MyTest, MyTestRow] with PhantomCassandraConnector {
 
   override val tableName = "mytest"
 
