@@ -18,7 +18,7 @@ package com.websudos.phantom.dsl.crud
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{
   MyTest,
   Primitive,

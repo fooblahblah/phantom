@@ -21,7 +21,7 @@ import org.scalatest.time.SpanSugar._
 import com.datastax.driver.core.utils.UUIDs
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{MyTest, MyTestRow, Primitive, Primitives, Recipe, Recipes, TestRow, TestTable}
 
 class InsertTest extends PhantomCassandraTestSuite {

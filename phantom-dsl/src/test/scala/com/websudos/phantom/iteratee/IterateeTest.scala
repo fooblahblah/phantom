@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ Primitives, Primitive, PrimitivesJoda, JodaRow }
 import com.newzly.util.testing.AsyncAssertionsHelper._
 

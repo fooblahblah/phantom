@@ -15,7 +15,7 @@
  */
 package com.websudos.phantom.iteratee
 
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 
 
 trait BigTest extends PhantomCassandraTestSuite {

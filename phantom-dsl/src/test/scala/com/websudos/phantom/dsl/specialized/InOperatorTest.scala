@@ -17,7 +17,7 @@ package com.websudos.phantom.dsl.specialized
 
 import com.datastax.driver.core.utils.UUIDs
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ Recipe, Recipes }
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler

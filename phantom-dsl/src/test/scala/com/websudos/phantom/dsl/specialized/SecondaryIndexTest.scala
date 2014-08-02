@@ -19,7 +19,7 @@ import com.datastax.driver.core.exceptions.InvalidQueryException
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{SecondaryIndexRecord, SecondaryIndexTable}
 
 class SecondaryIndexTest extends PhantomCassandraTestSuite {

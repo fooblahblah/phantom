@@ -21,7 +21,7 @@ import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.twitter.util.Duration
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{Primitive, Primitives}
 
 class TTLTest extends PhantomCassandraTestSuite {

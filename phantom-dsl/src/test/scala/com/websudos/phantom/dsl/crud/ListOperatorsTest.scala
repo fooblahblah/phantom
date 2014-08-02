@@ -23,7 +23,7 @@ import org.scalatest.time.SpanSugar._
 import com.datastax.driver.core.utils.UUIDs
 
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{Primitives, Recipe, Recipes}
 
 import com.newzly.util.testing.AsyncAssertionsHelper._

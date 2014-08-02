@@ -21,7 +21,7 @@ import org.scalatest.concurrent.PatienceConfiguration
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.Implicits._
-import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{TimeSeriesRecord, TimeSeriesTable}
 
 class TimeSeriesTest extends PhantomCassandraTestSuite {
