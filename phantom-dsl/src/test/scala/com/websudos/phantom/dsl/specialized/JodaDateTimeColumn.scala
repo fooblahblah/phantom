@@ -20,6 +20,7 @@ import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.{ JodaRow, PrimitivesJoda }
 import com.websudos.phantom.testing.PhantomCassandraTestSuite
 
@@ -35,14 +36,29 @@ class JodaDateTimeColumn extends PhantomCassandraTestSuite {
   it should "correctly insert and extract a JodaTime date" in {
     val row = JodaRow.sample
     PrimitivesJoda.insertSchema()
-    val w =
-        PrimitivesJoda.insert
-          .value(_.pkey, row.pkey)
-          .value(_.intColumn, row.int)
-          .value(_.timestamp, row.bi)
-          .future() flatMap  {
-            _ => PrimitivesJoda.select.one
-          }
+    val w = PrimitivesJoda.insert
+      .value(_.pkey, row.pkey)
+      .value(_.intColumn, row.int)
+      .value(_.timestamp, row.bi)
+      .future() flatMap  {
+        _ => PrimitivesJoda.select.where(_.pkey eqs row.pkey).one()
+      }
+
+    w successful {
+      res => res.get shouldEqual row
+    }
+  }
+
+  it should "correctly insert and extract a JodaTime date with Twitter Futures" in {
+    val row = JodaRow.sample
+    PrimitivesJoda.insertSchema()
+    val w = PrimitivesJoda.insert
+      .value(_.pkey, row.pkey)
+      .value(_.intColumn, row.int)
+      .value(_.timestamp, row.bi)
+      .execute() flatMap  {
+        _ => PrimitivesJoda.select.where(_.pkey eqs row.pkey).get()
+      }
 
     w successful {
       res => res.get shouldEqual row
