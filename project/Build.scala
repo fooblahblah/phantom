@@ -232,7 +232,7 @@ object phantom extends Build {
       "org.fluttercode.datafactory"      %  "datafactory"              % "0.8",
       "com.twitter"                      %% "finagle-serversets"       % finagleVersion,
       "com.twitter"                      %% "finagle-zookeeper"        % finagleVersion,
-      "org.cassandraunit"                %  "cassandra-unit"           % "2.0.2.2-SNAPSHOT"  excludeAll (
+      "org.cassandraunit"                %  "cassandra-unit"           % "2.0.2.3"  excludeAll (
         ExclusionRule("org.slf4j", "slf4j-log4j12"),
         ExclusionRule("org.slf4j", "slf4j-jdk14")
       ),
