@@ -15,14 +15,15 @@
  */
 package com.websudos.phantom.dsl.crud
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{Article, Articles}
-import com.websudos.phantom.testing.BaseTest
 
-class TruncateTest extends BaseTest {
+class TruncateTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

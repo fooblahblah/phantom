@@ -15,29 +15,25 @@
  */
 package com.websudos.phantom.dsl.crud
 
-import scala.concurrent.blocking
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.datastax.driver.core.utils.UUIDs
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ Recipe, Recipes }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-class MapOperationsTest extends BaseTest {
+class MapOperationsTest extends PhantomCassandraTestSuite {
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      Recipes.insertSchema()
-    }
+    super.beforeAll()
+    Recipes.insertSchema()
   }
 
   it should "support a single item map put operation" in {
     val recipe = Recipe.sample
     val id = UUIDs.timeBased()
-
     val props = Map("test" -> "test_val", "test2" -> "test_val")
     val item = "test3" -> "test_val"
 

@@ -15,22 +15,20 @@
  */
 package com.websudos.phantom.dsl.specialized
 
-import scala.concurrent.blocking
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ JodaRow, PrimitivesJoda }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-class JodaDateTimeColumn extends BaseTest {
+class JodaDateTimeColumn extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      PrimitivesJoda.insertSchema()
-    }
+    super.beforeAll()
+    PrimitivesJoda.insertSchema()
   }
 
   it should "correctly insert and extract a JodaTime date" in {

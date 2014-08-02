@@ -18,10 +18,10 @@ package com.websudos.phantom.dsl.batch
 import com.datastax.driver.core.utils.UUIDs
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{CounterTableTest, SecondaryCounterTable}
-import com.websudos.phantom.testing.BaseTest
 
-class CounterBatchTest extends BaseTest {
+class CounterBatchTest extends PhantomCassandraTestSuite {
 
   override def beforeAll(): Unit = {
     super.beforeAll()

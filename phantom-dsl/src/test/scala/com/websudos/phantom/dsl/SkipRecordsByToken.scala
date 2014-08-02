@@ -4,11 +4,11 @@ import scala.concurrent.blocking
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ Article, Articles }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-class SkipRecordsByToken extends BaseTest {
+class SkipRecordsByToken extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

@@ -19,6 +19,7 @@ import org.scalatest.{ Assertions, Matchers }
 import org.scalatest.concurrent.{ AsyncAssertions, PatienceConfiguration }
 import org.scalatest.time.SpanSugar._
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{
   Primitive,
   Primitives,
@@ -26,10 +27,8 @@ import com.websudos.phantom.tables.{
   TestTable
 }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-
-class UpdateTest extends BaseTest with Matchers with Assertions with AsyncAssertions {
+class UpdateTest extends PhantomCassandraTestSuite with Matchers with Assertions with AsyncAssertions {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(20 seconds)
 

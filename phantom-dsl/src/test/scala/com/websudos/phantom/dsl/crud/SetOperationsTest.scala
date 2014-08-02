@@ -15,13 +15,12 @@
  */
 package com.websudos.phantom.dsl.crud
 
-import scala.concurrent.blocking
-import com.websudos.phantom.Implicits._
-import com.websudos.phantom.tables.{Primitives, TestRow, TestTable}
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
+import com.websudos.phantom.tables.{TestRow, TestTable}
 
-class SetOperationsTest extends BaseTest {
+class SetOperationsTest extends PhantomCassandraTestSuite {
 
   override def beforeAll(): Unit = {
     super.beforeAll()

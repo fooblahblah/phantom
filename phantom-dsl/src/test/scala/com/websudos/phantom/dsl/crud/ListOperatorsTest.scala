@@ -23,12 +23,12 @@ import org.scalatest.time.SpanSugar._
 import com.datastax.driver.core.utils.UUIDs
 
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{Primitives, Recipe, Recipes}
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-class ListOperatorsTest extends BaseTest {
+class ListOperatorsTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

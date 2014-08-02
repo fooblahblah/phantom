@@ -15,14 +15,15 @@
  */
 package com.websudos.phantom.iteratee
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{ Primitive, Primitives }
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
 
-class IterateeDropTest extends BaseTest {
+class IterateeDropTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(2 minutes)
 

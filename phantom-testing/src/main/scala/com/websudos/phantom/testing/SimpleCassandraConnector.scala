@@ -18,11 +18,11 @@
 
 package com.websudos.phantom.testing
 
-import scala.concurrent.{ExecutionContext, blocking}
+import scala.concurrent.blocking
 import scala.util.DynamicVariable
 
 import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
-import org.scalatest.{ Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers, Suite }
+import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers, Suite}
 
 import com.datastax.driver.core.{Cluster, Session}
 import com.websudos.phantom.zookeeper.CassandraConnector
@@ -64,7 +64,6 @@ object DefaultCassandraManager extends CassandraManager {
 
 
 trait SimpleCassandraConnector extends CassandraSetup with CassandraConnector {
-  implicit val content: ExecutionContext = ExecutionContext.Implicits.global
   implicit lazy val session: Session = DefaultCassandraManager.session
 }
 

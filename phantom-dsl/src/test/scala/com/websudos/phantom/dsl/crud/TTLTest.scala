@@ -15,15 +15,16 @@
  */
 package com.websudos.phantom.dsl.crud
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.twitter.util.Duration
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{Primitive, Primitives}
-import com.websudos.phantom.testing.BaseTest
 
-class TTLTest extends BaseTest {
+class TTLTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(20 seconds)
 

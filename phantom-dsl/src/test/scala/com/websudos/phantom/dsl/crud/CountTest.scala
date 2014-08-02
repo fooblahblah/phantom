@@ -15,15 +15,16 @@
  */
 package com.websudos.phantom.dsl.crud
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.CassandraTestSuite
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.batch.BatchStatement
 import com.websudos.phantom.tables.{JodaRow, PrimitivesJoda}
 
-class CountTest extends CassandraTestSuite {
+class CountTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

@@ -40,6 +40,8 @@ trait ZookeeperConnector extends CassandraConnector {
   val zkManager: ZookeeperManager
 
   implicit lazy val session: Session = zkManager.session
+
+  val zkPath = "/cassandra"
 }
 
 /**

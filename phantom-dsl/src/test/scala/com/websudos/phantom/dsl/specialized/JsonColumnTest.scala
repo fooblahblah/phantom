@@ -19,7 +19,7 @@
 package com.websudos.phantom.dsl.specialized
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
-import com.websudos.phantom.testing.BaseTest
+import com.websudos.phantom.PhantomCassandraTestSuite
 
 import com.twitter.conversions.time._
 import com.twitter.util.Await
@@ -27,7 +27,7 @@ import com.twitter.util.Await
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.JsonTable
 
-class JsonColumnTest extends BaseTest {
+class JsonColumnTest extends PhantomCassandraTestSuite {
 
   override def beforeAll(): Unit = {
     super.beforeAll()

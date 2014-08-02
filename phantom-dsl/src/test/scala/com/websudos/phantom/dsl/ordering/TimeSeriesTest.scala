@@ -21,10 +21,10 @@ import org.scalatest.concurrent.PatienceConfiguration
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{TimeSeriesRecord, TimeSeriesTable}
-import com.websudos.phantom.testing.BaseTest
 
-class TimeSeriesTest extends BaseTest {
+class TimeSeriesTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 

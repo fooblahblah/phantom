@@ -24,4 +24,4 @@ trait PhantomCassandraConnector extends SimpleCassandraConnector {
   val keySpace = "phantom"
 }
 
-trait CassandraTestSuite extends CassandraFlatSpec with PhantomCassandraConnector
+trait PhantomCassandraTestSuite extends CassandraFlatSpec with PhantomCassandraConnector

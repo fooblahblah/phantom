@@ -16,6 +16,8 @@
 package com.websudos.phantom.iteratee
 
 import java.util.concurrent.atomic.AtomicLong
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.scalatest.concurrent.ScalaFutures
 import com.websudos.phantom.tables.PrimitivesJoda
 import com.newzly.util.testing.AsyncAssertionsHelper._

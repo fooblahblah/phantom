@@ -23,11 +23,10 @@ import org.scalatest.time.SpanSugar._
 
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.websudos.phantom.Implicits._
+import com.websudos.phantom.PhantomCassandraTestSuite
 import com.websudos.phantom.tables.{JodaRow, PrimitivesJoda}
-import com.websudos.phantom.testing.BaseTest
 
-
-class BatchTest extends BaseTest {
+class BatchTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
