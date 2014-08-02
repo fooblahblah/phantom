@@ -77,3 +77,10 @@ trait SimpleCassandraTest extends ScalaFutures with SimpleCassandraConnector wit
 
 trait CassandraFlatSpec extends FlatSpec with SimpleCassandraTest
 trait CassandraFeatureSpec extends FeatureSpec with SimpleCassandraTest
+
+
+trait PhantomCassandraConnector extends SimpleCassandraConnector {
+  val keySpace = "phantom"
+}
+
+trait PhantomCassandraTestSuite extends CassandraFlatSpec with PhantomCassandraConnector

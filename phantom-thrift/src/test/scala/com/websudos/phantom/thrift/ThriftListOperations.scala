@@ -15,27 +15,28 @@
  */
 package com.websudos.phantom.thrift
 
-import scala.concurrent.blocking
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
-import com.websudos.phantom.Implicits._
-import com.websudos.phantom.tables.ThriftColumnTable
+
+import com.datastax.driver.core.utils.UUIDs
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
-import com.websudos.phantom.testing.BaseTest
+import com.websudos.phantom.Implicits._
+import com.websudos.phantom.tables.ThriftColumnTable
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 
-class ThriftListOperations extends BaseTest {
+class ThriftListOperations extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
   override def beforeAll(): Unit = {
-    blocking {
-      super.beforeAll()
-      ThriftColumnTable.insertSchema()
-    }
+    super.beforeAll()
+    ThriftColumnTable.insertSchema()
   }
 
   it should "prepend an item to a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -49,7 +50,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -58,8 +59,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList prepend sample2).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList prepend sample2).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -73,6 +74,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "prepend an item to a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -86,7 +89,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -95,8 +98,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList prepend sample2).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList prepend sample2).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -108,6 +111,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "prepend several items to a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -129,7 +134,7 @@ class ThriftListOperations extends BaseTest {
     val toAppend = List(sample2, sample3)
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -138,8 +143,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList prependAll toAppend).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList prependAll toAppend).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -153,6 +158,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "prepend several items to a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -174,7 +181,7 @@ class ThriftListOperations extends BaseTest {
     val toAppend = List(sample2, sample3)
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -183,8 +190,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList prependAll toAppend).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList prependAll toAppend).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -196,6 +203,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "append an item to a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -209,7 +218,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -218,8 +227,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList append sample2).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList append sample2).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -233,6 +242,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "append an item to a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -246,7 +257,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -255,8 +266,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList append sample2).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList append sample2).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -268,6 +279,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "append several items to a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -289,7 +302,7 @@ class ThriftListOperations extends BaseTest {
     val toAppend = List(sample2, sample3)
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -298,8 +311,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList appendAll toAppend).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList appendAll toAppend).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -313,6 +326,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "append several items to a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -334,7 +349,7 @@ class ThriftListOperations extends BaseTest {
     val toAppend = List(sample2, sample3)
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -343,8 +358,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList appendAll toAppend).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList appendAll toAppend).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -356,6 +371,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "remove an item from a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -369,7 +386,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -378,8 +395,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList discard sample2).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList discard sample2).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -393,6 +410,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "remove an item from a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -406,7 +425,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -415,8 +434,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList discard sample2).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList discard sample2).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -428,6 +447,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "remove several items from a thrift list column" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -447,7 +468,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -456,8 +477,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList discardAll List(sample2, sample3)).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList discardAll List(sample2, sample3)).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -471,6 +492,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "remove several items from a thrift list column with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -490,7 +513,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -499,8 +522,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList discardAll List(sample2, sample3)).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList discardAll List(sample2, sample3)).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -512,6 +535,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "set an index to a given value" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -531,7 +556,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -540,8 +565,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList setIdx(0, sample3)).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList setIdx(0, sample3)).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield {
       select
     }
@@ -555,6 +580,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "set an index to a given value with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -574,7 +601,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -583,8 +610,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList setIdx(0, sample3)).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList setIdx(0, sample3)).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {
@@ -596,6 +623,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "set a non-zero index to a given value" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -615,7 +644,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -624,8 +653,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList setIdx(2, sample3)).future()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList setIdx(2, sample3)).future()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).one
     } yield select
 
     operation.successful {
@@ -637,6 +666,8 @@ class ThriftListOperations extends BaseTest {
   }
 
   it should "set a non-zero index to a given value with Twitter Futures" in {
+    val id = UUIDs.timeBased()
+
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
       Sampler.getARandomString,
@@ -656,7 +687,7 @@ class ThriftListOperations extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -665,8 +696,8 @@ class ThriftListOperations extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftList setIdx(2, sample3)).execute()
-      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs sample.id).get
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftList setIdx(2, sample3)).execute()
+      select <- ThriftColumnTable.select(_.thriftList).where(_.id eqs id).get
     } yield select
 
     operation.successful {

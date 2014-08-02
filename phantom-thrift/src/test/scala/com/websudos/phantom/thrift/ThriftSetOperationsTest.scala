@@ -15,21 +15,30 @@
  */
 package com.websudos.phantom.thrift
 
+import java.util.UUID
+
 import org.scalatest.concurrent.PatienceConfiguration
 import org.scalatest.time.SpanSugar._
 
+import com.datastax.driver.core.utils.UUIDs
 import com.newzly.util.testing.AsyncAssertionsHelper._
 import com.newzly.util.testing.Sampler
 import com.websudos.phantom.Implicits._
 import com.websudos.phantom.tables.ThriftColumnTable
-import com.websudos.phantom.testing.BaseTest
+import com.websudos.phantom.testing.PhantomCassandraTestSuite
 
-class ThriftSetOperationsTest extends BaseTest {
+class ThriftSetOperationsTest extends PhantomCassandraTestSuite {
 
   implicit val s: PatienceConfiguration.Timeout = timeout(10 seconds)
 
-  it should "add an item to a thrift set column" in {
+  override def beforeAll(): Unit = {
+    super.beforeAll()
     ThriftColumnTable.insertSchema
+  }
+
+  it should "add an item to a thrift set column" in {
+
+    val id = UUIDs.timeBased()
 
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
@@ -44,7 +53,7 @@ class ThriftSetOperationsTest extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -52,8 +61,8 @@ class ThriftSetOperationsTest extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftSet add sample2).future()
-      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftSet add sample2).future()
+      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs id).one
     } yield {
       select
     }
@@ -67,7 +76,8 @@ class ThriftSetOperationsTest extends BaseTest {
   }
 
   it should "add several items a thrift set column" in {
-    ThriftColumnTable.insertSchema
+
+    val id = UUIDs.timeBased()
 
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
@@ -88,7 +98,7 @@ class ThriftSetOperationsTest extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample))
@@ -96,8 +106,8 @@ class ThriftSetOperationsTest extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftSet addAll Set(sample2, sample3)).future()
-      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftSet addAll Set(sample2, sample3)).future()
+      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs id).one
     } yield {
       select
     }
@@ -111,7 +121,8 @@ class ThriftSetOperationsTest extends BaseTest {
   }
 
   it should "remove one item from a thrift set column" in {
-    ThriftColumnTable.insertSchema
+
+    val id = UUIDs.timeBased()
 
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
@@ -132,7 +143,7 @@ class ThriftSetOperationsTest extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample, sample2, sample3))
@@ -140,8 +151,8 @@ class ThriftSetOperationsTest extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftSet remove sample3).future()
-      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftSet remove sample3).future()
+      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs id).one
     } yield {
       select
     }
@@ -156,7 +167,8 @@ class ThriftSetOperationsTest extends BaseTest {
 
 
   it should "remove several items from thrift set column" in {
-    ThriftColumnTable.insertSchema
+
+    val id = UUIDs.timeBased()
 
     val sample = ThriftTest(
       Sampler.getARandomInteger(),
@@ -177,7 +189,7 @@ class ThriftSetOperationsTest extends BaseTest {
     )
 
     val insert = ThriftColumnTable.insert
-      .value(_.id, sample.id)
+      .value(_.id, id)
       .value(_.name, sample.name)
       .value(_.ref, sample)
       .value(_.thriftSet, Set(sample, sample2, sample3))
@@ -185,8 +197,8 @@ class ThriftSetOperationsTest extends BaseTest {
 
     val operation = for {
       insertDone <- insert
-      update <- ThriftColumnTable.update.where(_.id eqs sample.id).modify(_.thriftSet removeAll Set(sample2, sample3)).future()
-      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs sample.id).one
+      update <- ThriftColumnTable.update.where(_.id eqs id).modify(_.thriftSet removeAll Set(sample2, sample3)).future()
+      select <- ThriftColumnTable.select(_.thriftSet).where(_.id eqs id).one
     } yield {
       select
     }
