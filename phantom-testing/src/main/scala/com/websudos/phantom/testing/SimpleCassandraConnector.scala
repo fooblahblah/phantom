@@ -18,8 +18,9 @@
 
 package com.websudos.phantom.testing
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import scala.concurrent.blocking
-import scala.util.DynamicVariable
 
 import org.scalatest.concurrent.{AsyncAssertions, ScalaFutures}
 import org.scalatest.{Assertions, BeforeAndAfterAll, FeatureSpec, FlatSpec, Matchers, Suite}
@@ -34,8 +35,8 @@ trait CassandraManager {
 
 object DefaultCassandraManager extends CassandraManager {
 
-  private[this] lazy val sessionStore = new DynamicVariable[Session](null)
-  private[this] var inited = false
+  private[this] val inited = new AtomicBoolean(false)
+  @volatile private[this] var _session: Session = null
 
   lazy val cluster: Cluster = Cluster.builder()
     .addContactPoint("localhost")
@@ -44,19 +45,16 @@ object DefaultCassandraManager extends CassandraManager {
     .withoutMetrics()
     .build()
 
-  def session = sessionStore.value
+  def session = _session
 
-  def initIfNotInited(keySpace: String): Unit = Lock.synchronized {
-    if (!inited) {
-      sessionStore.value_=(
-        blocking {
+  def initIfNotInited(keySpace: String): Unit = {
+    if (inited.compareAndSet(false, true)) {
+      _session = blocking {
           val s = cluster.connect()
           s.execute(s"CREATE KEYSPACE IF NOT EXISTS $keySpace WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1};")
           s.execute(s"USE $keySpace;")
           s
         }
-      )
-      inited = true
     }
   }
 

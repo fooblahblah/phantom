@@ -43,6 +43,8 @@ private[phantom] trait CassandraResultSetOperations {
   protected[this] def scalaStatementToFuture(s: Statement)(implicit session: Session): ScalaFuture[ResultSet] = {
     val promise = ScalaPromise[ResultSet]()
 
+    assert(session != null)
+
     val future = session.executeAsync(s)
 
     val callback = new FutureCallback[ResultSet] {
