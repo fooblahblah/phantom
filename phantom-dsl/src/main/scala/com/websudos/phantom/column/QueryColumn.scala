@@ -176,6 +176,9 @@ sealed trait ModifyImplicits extends LowPriorityImplicits {
 
   implicit final def columnsAreModifiable[T <: AbstractColumn[_]]: ModifiableColumn[T] = new ModifiableColumn[T]
 
+  implicit final def indexesAreModifiable[T <: AbstractColumn[RR] with Index[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
+  implicit final def indexesAreModifiable2[T <: AbstractColumn[RR] with Index[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
+
   implicit final def countersAreNotModifiable[T <: AbstractColumn[RR] with CounterRestriction[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
   implicit final def countersAreNotModifiable2[T <: AbstractColumn[RR] with CounterRestriction[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
 
@@ -187,8 +190,6 @@ sealed trait ModifyImplicits extends LowPriorityImplicits {
 
   implicit final def partitionKeysAreNotModifiable[T <: AbstractColumn[RR] with PartitionKey[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
   implicit final def partitionKeysAreNotModifiable2[T <: AbstractColumn[RR] with PartitionKey[RR], RR]: ModifiableColumn[T] = new ModifiableColumn
-  implicit final def indexesAreNotModifiable[T <: AbstractColumn[RR] with Index[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
-  implicit final def indexesAreNotModifiable2[T <: AbstractColumn[RR] with Index[RR], RR]: ModifiableColumn[T] = new ModifiableColumn[T]
 
   implicit final def columnToModifyColumn[T](col: AbstractColumn[T]): ModifyColumn[T] = new ModifyColumn[T](col)
 
@@ -203,10 +204,6 @@ sealed trait ModifyImplicits extends LowPriorityImplicits {
   @implicitNotFound(msg = "The value of partition key columns cannot be updated as per the Cassandra specification")
   implicit final def notPartitionKeys[T <: PartitionKey[RR] : ModifiableColumn, RR]
     (obj: AbstractColumn[RR] with PartitionKey[RR]): ModifyColumn[RR] = new ModifyColumn(obj)
-
-  @implicitNotFound(msg = "The value of indexed columns cannot be updated as per the Cassandra specification")
-  implicit final def notIndexKeys[T <: PartitionKey[RR] : ModifiableColumn, RR]
-  (obj: AbstractColumn[RR] with Index[RR]): ModifyColumn[RR] = new ModifyColumn(obj)
 
   @implicitNotFound(msg = "The value of clustering columns cannot be updated as per the Cassandra specification")
   implicit final def notClusteringKeys[T <: ClusteringOrder[RR] : ModifiableColumn, RR]

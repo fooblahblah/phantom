@@ -44,7 +44,7 @@ object SimpleCassandraManager extends CassandraManager {
     .withoutMetrics()
     .build()
 
-  implicit def session = sessionStore.value
+  implicit val session = sessionStore.value
 
   def initIfNotInited(keySpace: String): Unit = synchronized {
     if (!inited) {

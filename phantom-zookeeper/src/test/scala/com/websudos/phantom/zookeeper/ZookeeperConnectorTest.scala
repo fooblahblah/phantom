@@ -74,7 +74,7 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
   }
 
   it should "correctly retrieve the Cassandra series of ports from the Zookeeper cluster" in {
-    instance.richClient.getData(TestTable.zkPath, watch = false) successful {
+    instance.richClient.getData(instance.zkPath, watch = false) successful {
       res => {
         info("Ports correctly retrieved from Cassandra.")
         new String(res.data) shouldEqual "localhost:9142"
@@ -90,7 +90,7 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
   it should "correctly retrieve the Sequence of InetSocketAddresses from zookeeper" in {
     val pairs = TestTable.zkManager.store.hostnamePortPairs
 
-    TestTable.zkManager.store.zkClient.getData(TestTable.zkPath, watch = false).successful {
+    TestTable.zkManager.store.zkClient.getData(instance.zkPath, watch = false).successful {
       res => {
         val data = new String(res.data)
         data shouldEqual "localhost:9142"
@@ -102,8 +102,8 @@ class ZookeeperConnectorTest extends FlatSpec with Matchers with BeforeAndAfterA
 
   it should "correctly parse multiple pairs of hostname:port from Zookeeper" in {
     val chain = for {
-      set <- TestTable.zkManager.store.zkClient.setData(TestTable.zkPath, "localhost:9142, localhost:9900, 127.131.211.23:3402".getBytes, -1)
-      get <- TestTable.zkManager.store.zkClient.getData("/cassandra", watch = false)
+      set <- TestTable.zkManager.store.zkClient.setData(instance.zkPath, "localhost:9142, localhost:9900, 127.131.211.23:3402".getBytes, -1)
+      get <- TestTable.zkManager.store.zkClient.getData(instance.zkPath, watch = false)
     } yield new String(get.data)
 
     chain.successful {
